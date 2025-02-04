@@ -3,11 +3,12 @@ pub mod response;
 use std::sync::Arc;
 
 use anyhow::Result;
-use hex::encode;
 use sha1::{Digest, Sha1};
 
 use crate::client_sessions::Session;
 use rsa::pkcs8::EncodePublicKey;
+
+use num_bigint::BigInt;
 
 pub async fn join(
     session: &mut Session,
@@ -16,8 +17,10 @@ pub async fn join(
     let mut digest = Sha1::new();
     digest.update(session.server_id.as_bytes());
     digest.update(session.secret.clone().unwrap().as_slice());
-    digest.update(keys.to_public_key().to_public_key_der()?);
-    let hash = encode(digest.finalize());
+    digest.update(keys.to_public_key().to_public_key_der()?.as_bytes());
+    let hash = BigInt::from_signed_bytes_be(&digest.finalize()).to_str_radix(16);
+
+    println!("{:}", hash);
 
     let url = format!(
         "https://sessionserver.mojang.com/session/minecraft/hasJoined?username={}&serverId={}",
