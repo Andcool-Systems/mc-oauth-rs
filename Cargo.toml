@@ -1,0 +1,20 @@
+[package]
+name = "mc-oauth"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+bytes = "1.0"
+rsa = "0.9"
+rand = "0.8"
+pkcs8 = "0.10"
+sha1 = "0.10"
+aes = "0.8"
+ctr = "0.9"
+hex = "0.4"
+cfb8 = "0.8"
+anyhow = "1.0.95"
+serde_json = "1.0.138"
+serde = { version = "1.0.217", features = ["derive"] }
+reqwest = "0.12.12"

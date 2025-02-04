@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Rust Project",
+            "detail": "Run Rust application",
+            "type": "shell",
+            "command": "cargo",
+            "args": [
+                "run"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "runOptions": {
+                "reevaluateOnRerun": true
+            },
+            "options": {
+                "statusbar": {
+                    "label": "$(debug-start) Run"
+                }
+            }
+        },
+        {
+            "label": "Build",
+            "detail": "Build Rust application",
+            "type": "shell",
+            "command": "cargo build --release --bin hub-rs",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": [
+                "$rustc"
+            ],
+            "runOptions": {
+                "reevaluateOnRerun": true
+            },
+            "options": {
+                "statusbar": {
+                    "label": "$(pass) Build"
+                }
+            }
+        }
+    ]
+}
