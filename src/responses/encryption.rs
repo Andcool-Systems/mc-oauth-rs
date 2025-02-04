@@ -8,7 +8,6 @@ use crate::{client_sessions::Session, packets::encryption_request::EncryptionReq
 pub async fn send(
     stream: &mut TcpStream,
     keys: Arc<rsa::RsaPrivateKey>,
-    verify_token: [u8; 4],
     session: &mut Session,
 ) -> Result<()> {
     let public_der = keys
@@ -26,7 +25,7 @@ pub async fn send(
     let packet = EncryptionRequestPacket::new(
         session.server_id.clone(),
         public_der,
-        verify_token.to_vec(),
+        session.verify_token.to_vec(),
         should_authenticate,
     );
     stream.write_all(&packet.build()?).await?;

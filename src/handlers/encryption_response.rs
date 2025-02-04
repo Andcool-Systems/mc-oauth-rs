@@ -8,16 +8,21 @@ use rsa::{Pkcs1v15Encrypt, RsaPrivateKey};
 
 pub fn handle(
     session: &mut Session,
-    buff: &mut BytesMut,
+    buffer: &mut BytesMut,
     keys: Arc<rsa::RsaPrivateKey>,
-    verify_token: [u8; 4],
 ) -> Result<()> {
-    let response = EncryptionResponsePacket::parse(buff)?;
+    let response = EncryptionResponsePacket::parse(buffer)?;
 
     let decrypted_secret = decrypt(keys.as_ref(), &response.shared_secret)?;
     let decrypted_verify = decrypt(keys.as_ref(), &response.verify_token)?;
 
-    if decrypted_verify.iter().zip(&verify_token).filter(|&(a, b)| a == b).count() != decrypted_verify.len() {
+    if decrypted_verify
+        .iter()
+        .zip(&session.verify_token)
+        .filter(|&(a, b)| a == b)
+        .count()
+        != decrypted_verify.len()
+    {
         panic!("Verify tokens didn't match!");
     }
 

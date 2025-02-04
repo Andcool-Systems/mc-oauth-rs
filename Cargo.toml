@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
+actix-web = "4.9.0"
 bytes = "1.0"
 rsa = "0.9"
 rand = "0.8"
@@ -18,3 +19,5 @@ serde_json = "1.0.138"
 serde = { version = "1.0.217", features = ["derive"] }
 reqwest = "0.12.12"
 num-bigint = "0.4.6"
+tracing = "0.1.41"
+futures = "0.3"
