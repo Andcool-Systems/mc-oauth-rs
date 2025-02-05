@@ -3,10 +3,12 @@ use std::{sync::Arc, time::Duration};
 use anyhow::Result;
 use bytes::{BufMut, BytesMut};
 use tokio::net::TcpStream;
+use tracing::info;
 
 use crate::{
     byte_buf_utils::read_varint,
     client_sessions::{NextStateEnum, Session},
+    config::get_config,
     generators::keys::generate_code,
     handlers::{encryption_response, handshake, login_start},
     map::get_map,
@@ -16,14 +18,15 @@ use crate::{
 
 pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Result<()> {
     let mut buffer = BytesMut::new();
-    let session = &mut Session::new();
+    let session = &mut Session::new(); // Create session for current client
+    let config = get_config().await;
 
+    stream.readable().await?;
     loop {
         let mut temp_buf = vec![0; 1024];
-        stream.readable().await?;
 
         match stream.try_read(&mut temp_buf) {
-            Ok(0) => break,
+            Ok(0) => break, // if client disconnected
             Ok(n) => {
                 buffer.put_slice(&temp_buf[..n]);
 
@@ -43,6 +46,7 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
 
                         0x01 => match session.next_state {
                             NextStateEnum::Status => {
+                                // Handle ping request
                                 ping::handle_and_send(&mut stream, &mut buffer).await?
                             }
                             NextStateEnum::Login => {
@@ -51,23 +55,25 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                 let player_data = mojang::join(session, keys.clone()).await?;
                                 if player_data.is_none() {
                                     disconnect::send(
-                                    &mut stream,
-                                    session,
-                                    "Failed to login: Invalid session (Try restarting your game and the launcher)".to_string()
-                                ).await?;
+                                        &mut stream,
+                                        session,
+                                        "Failed to login: Invalid session (Try restarting your game and the launcher)".to_string()
+                                    ).await?;
                                     break;
                                 }
                                 let player_data = player_data.unwrap();
                                 let map = get_map().await;
-                                let code = generate_code();
+                                let code = generate_code(6); // Generate 6-digit code
 
+                                // Insert client data into hash map
                                 map.insert(
                                     code.clone(),
                                     player_data.clone(),
-                                    Duration::from_secs(60 * 5),
+                                    Duration::from_secs(config.code_life_time),
                                 )
                                 .await;
 
+                                // Disconnect client with code
                                 disconnect::send(
                                     &mut stream,
                                     session,
@@ -75,7 +81,7 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                 )
                                 .await?;
 
-                                println!("Created code {} for {}", code, player_data.name);
+                                info!("Created code {} for {}", code, player_data.name);
                                 break;
                             }
                             NextStateEnum::Unknown => break,
@@ -89,10 +95,9 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
         buffer.clear();
     }
 
-    println!("Disconnected!");
+    info!("Connection from {} closed", stream.peer_addr()?);
     Ok(())
 }
-
 
 fn packet_available(buffer: &mut BytesMut) -> bool {
     if buffer.len() == 0 {

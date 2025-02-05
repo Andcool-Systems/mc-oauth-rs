@@ -1,0 +1,10 @@
+{
+    "server_port": 1488,
+    "api_port": 8008,
+    "players_max": 0,
+    "players_online": 0,
+    "proto_ver": 0,
+    "server_ver": "1.21.4",
+    "motd": "ГООООЛ",
+    "code_life_time": 300
+}

@@ -3,13 +3,16 @@
 // use std::sync::Arc;
 // use tokio::sync::Mutex;
 
+use aes::Aes128;
+use cfb8::Encryptor;
+
 use crate::generators::keys::generate_verify_token;
 
 #[derive(Debug)]
 pub enum NextStateEnum {
     Status,
     Login,
-    Unknown
+    Unknown,
 }
 
 #[derive(Debug)]
@@ -19,7 +22,8 @@ pub struct Session {
     pub next_state: NextStateEnum,
     pub nickname: Option<String>,
     pub secret: Option<Vec<u8>>, // Shared secret,
-    pub verify_token: [u8; 4]
+    pub verify_token: [u8; 4],
+    pub cipher: Option<Encryptor<Aes128>>,
 }
 
 impl Session {
@@ -30,7 +34,8 @@ impl Session {
             next_state: NextStateEnum::Unknown,
             nickname: None,
             secret: None,
-            verify_token: generate_verify_token()
+            verify_token: generate_verify_token(),
+            cipher: None,
         }
     }
 }

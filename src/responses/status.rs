@@ -5,16 +5,24 @@ use tokio::{io::AsyncWriteExt, net::TcpStream};
 
 use crate::{
     client_sessions::Session,
+    config::get_config,
     packets::status::{StatusData, StatusPacket},
 };
 
 pub async fn send(stream: &mut TcpStream, session: &mut Session) -> Result<()> {
+    let config = get_config().await;
+    let proto_ver = if config.proto_ver == 0 {
+        session.proto_ver.unwrap()
+    } else {
+        config.proto_ver
+    };
+
     let data = StatusData {
-        version_name: "1.21.4".to_string(),
-        version_protocol: session.proto_ver.unwrap(),
-        players_max: 0,
-        players_online: 0,
-        description: json!({"text": "Hello, world!"}),
+        version_name: config.server_ver.clone(),
+        version_protocol: proto_ver,
+        players_max: config.players_max,
+        players_online: config.players_online,
+        description: json!({"text": config.motd.clone()}),
         favicon: "".to_string(),
         enforces_secure_chat: false,
     };

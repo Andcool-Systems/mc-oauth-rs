@@ -7,6 +7,8 @@ use crate::map::get_map;
 #[instrument(skip(path))]
 #[get("/code/{id}")]
 pub async fn code(path: web::Path<String>) -> impl Responder {
+    // Get data endpoint
+
     let path = path.into_inner();
     info!("Get code with path: {}", path);
 
@@ -19,7 +21,7 @@ pub async fn code(path: web::Path<String>) -> impl Responder {
     match value {
         Some(value) => {
             let mut map = map_guard.map.write().await;
-            map.remove(&path);
+            map.remove(&path); // Remove data after first use
 
             HttpResponse::Ok().json(serde_json::to_value(&value).unwrap())
         }

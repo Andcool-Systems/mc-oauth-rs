@@ -12,8 +12,8 @@ pub fn generate_verify_token() -> [u8; 4] {
     token
 }
 
-pub fn generate_code() -> String {
-    (0..6)
+pub fn generate_code(len: u8) -> String {
+    (0..len)
         .map(|_| rand::thread_rng().gen_range(0..=9).to_string())
         .collect()
 }

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::{client_sessions::Session, packets::encryption_response::EncryptionResponsePacket};
+use aes::{cipher::KeyIvInit, Aes128};
 use anyhow::Result;
 use bytes::BytesMut;
 
@@ -13,9 +14,11 @@ pub fn handle(
 ) -> Result<()> {
     let response = EncryptionResponsePacket::parse(buffer)?;
 
-    let decrypted_secret = decrypt(keys.as_ref(), &response.shared_secret)?;
-    let decrypted_verify = decrypt(keys.as_ref(), &response.verify_token)?;
+    // Decrypt client's keys
+    let decrypted_secret = decrypt(&keys, &response.shared_secret)?;
+    let decrypted_verify = decrypt(&keys, &response.verify_token)?;
 
+    // Check tokens equality
     if decrypted_verify
         .iter()
         .zip(&session.verify_token)
@@ -26,7 +29,15 @@ pub fn handle(
         panic!("Verify tokens didn't match!");
     }
 
+    // Set up client cipher
     session.secret = Some(decrypted_secret.clone());
+    session.cipher = Some(
+        cfb8::Encryptor::<Aes128>::new_from_slices(
+            &decrypted_secret.clone(),
+            &decrypted_secret.clone(),
+        )
+        .unwrap(),
+    );
     Ok(())
 }
 

@@ -1,10 +1,9 @@
-use std::io;
-
 use crate::{
     client_sessions::{NextStateEnum, Session},
     packets::handshake::HandshakePacket,
 };
 use bytes::BytesMut;
+use std::io;
 
 pub fn handle(session: &mut Session, buff: &mut BytesMut) -> Result<(), io::Error> {
     let handshake = HandshakePacket::parse(buff)?;
