@@ -3,6 +3,7 @@ mod byte_buf_utils;
 mod client_sessions;
 mod config;
 mod encryption;
+mod format;
 mod generators;
 mod handlers;
 mod map;

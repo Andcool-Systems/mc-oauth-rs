@@ -17,13 +17,18 @@ pub async fn send(stream: &mut TcpStream, session: &mut Session) -> Result<()> {
         config.proto_ver
     };
 
+    let icon = match &config.image {
+        Some(img) => img,
+        None => &"".to_string()
+    };
+
     let data = StatusData {
         version_name: config.server_ver.clone(),
         version_protocol: proto_ver,
         players_max: config.players_max,
         players_online: config.players_online,
         description: json!({"text": config.motd.clone()}),
-        favicon: "".to_string(),
+        favicon: icon.to_string(),
         enforces_secure_chat: false,
     };
 

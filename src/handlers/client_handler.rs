@@ -3,7 +3,7 @@ use std::{sync::Arc, time::Duration};
 use anyhow::Result;
 use bytes::{BufMut, BytesMut};
 use tokio::net::TcpStream;
-use tracing::info;
+use tracing::{debug, info};
 
 use crate::{
     byte_buf_utils::read_varint,
@@ -32,7 +32,7 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
 
                 while packet_available(&mut buffer) {
                     let packet_id = read_varint(&mut buffer)?;
-                    info!("Received packet: {}", packet_id);
+                    debug!("Received packet: {}", packet_id);
 
                     match packet_id {
                         0x00 => match session.next_state {
@@ -58,7 +58,7 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                     disconnect::send(
                                         &mut stream,
                                         session,
-                                        "Failed to login: Invalid session (Try restarting your game and the launcher)".to_string()
+                                        "§cFailed to login: Invalid session (Try restarting your game and the launcher)".to_string()
                                     ).await?;
                                     break;
                                 }
@@ -78,7 +78,7 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                 disconnect::send(
                                     &mut stream,
                                     session,
-                                    format!("Hello, {}! Your code is: {}", player_data.name, code),
+                                    format!("Hello, §6{}§r! Your code is: §a{}", player_data.name, code),
                                 )
                                 .await?;
 
