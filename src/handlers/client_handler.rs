@@ -21,9 +21,9 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
     let session = &mut Session::new(); // Create session for current client
     let config = get_config().await;
 
-    stream.readable().await?;
     loop {
         let mut temp_buf = vec![0; 1024];
+        stream.readable().await?;
 
         match stream.try_read(&mut temp_buf) {
             Ok(0) => break, // if client disconnected
@@ -32,6 +32,7 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
 
                 while packet_available(&mut buffer) {
                     let packet_id = read_varint(&mut buffer)?;
+                    info!("Received packet: {}", packet_id);
 
                     match packet_id {
                         0x00 => match session.next_state {
@@ -94,8 +95,6 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
         }
         buffer.clear();
     }
-
-    info!("Connection from {} closed", stream.peer_addr()?);
     Ok(())
 }
 

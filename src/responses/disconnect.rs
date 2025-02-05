@@ -13,6 +13,7 @@ pub async fn send(stream: &mut TcpStream, session: &mut Session, reason: String)
 
     encrypt_packet(&mut disconnect_packet, session);
 
+    stream.writable().await?;
     stream.write_all(&disconnect_packet).await?;
     stream.shutdown().await?;
     Ok(())

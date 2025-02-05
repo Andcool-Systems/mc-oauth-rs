@@ -28,6 +28,7 @@ pub async fn send(
         session.verify_token.to_vec(),
         should_authenticate,
     );
+    stream.writable().await?;
     stream.write_all(&packet.build()?).await?;
     Ok(())
 }

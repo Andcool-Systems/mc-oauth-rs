@@ -96,8 +96,9 @@ async fn main() -> anyhow::Result<()> {
 
                         tokio::spawn(async move {
                             // Setting client timeout
-                            if let Err(e) = timeout(Duration::from_secs(15), client_handler::handle(stream, keys)).await {
-                                error!("Client exceptionally closed connection: {}", e);
+                            match timeout(Duration::from_secs(10), client_handler::handle(stream, keys)).await {
+                                Ok(_) => info!("Connection from {} closed", addr),
+                                Err(e) => error!("Client exceptionally closed connection: {}", e)
                             }
                         });
                     },
