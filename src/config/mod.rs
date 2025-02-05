@@ -16,7 +16,7 @@ pub async fn load(path: &str) -> Result<()> {
 
     let mut config: types::Config =
         serde_json::from_str(&file).expect("Couldn't parse config json");
-    match server_icon::load(&config.icon).await {
+    match server_icon::load(&config.icon_path).await {
         Ok(base64) => config.image = Some(format!("data:image/png;base64,{}", base64)),
         Err(e) => warn!("Error loading server icon: {}", e)
     }

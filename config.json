@@ -7,5 +7,5 @@
     "server_ver": "1.21.4",
     "motd": "§6mc-oauth.andcool.ru",
     "code_life_time": 300,
-    "icon": "server_icon.png"
+    "icon_path": "server_icon.png"
 }

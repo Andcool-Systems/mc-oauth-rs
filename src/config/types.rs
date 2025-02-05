@@ -27,7 +27,7 @@ pub struct Config {
     pub code_life_time: u64,
 
     /// Path to the server icon
-    pub icon: String,
+    pub icon_path: String,
 
     #[serde(skip)]
     /// Base 64 encoded server icon

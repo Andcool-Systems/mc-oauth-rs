@@ -3,11 +3,7 @@ use anyhow::Result;
 use serde_json::json;
 use tokio::{io::AsyncWriteExt, net::TcpStream};
 
-use crate::{
-    client_sessions::Session,
-    config::get_config,
-    packets::status::{StatusData, StatusPacket},
-};
+use crate::{client_sessions::Session, config::get_config, packets::status};
 
 pub async fn send(stream: &mut TcpStream, session: &mut Session) -> Result<()> {
     let config = get_config().await;
@@ -17,21 +13,23 @@ pub async fn send(stream: &mut TcpStream, session: &mut Session) -> Result<()> {
         config.proto_ver
     };
 
-    let icon = match &config.image {
-        Some(img) => img,
-        None => &"".to_string()
-    };
-
-    let data = StatusData {
-        version_name: config.server_ver.clone(),
-        version_protocol: proto_ver,
-        players_max: config.players_max,
-        players_online: config.players_online,
+    let data = status::StatusData {
+        version: status::Version {
+            name: config.server_ver.clone(),
+            protocol: proto_ver,
+        },
+        players: status::Players {
+            max: config.players_max,
+            online: config.players_online,
+            sample: vec![],
+        },
         description: json!({"text": config.motd.clone()}),
-        favicon: icon.to_string(),
+        favicon: config.image.clone(),
         enforces_secure_chat: false,
     };
 
-    stream.write_all(&StatusPacket::build(data)?).await?;
+    stream
+        .write_all(&status::StatusPacket::build(data)?)
+        .await?;
     Ok(())
 }
