@@ -25,6 +25,6 @@ pub async fn code(path: web::Path<String>) -> impl Responder {
 
             HttpResponse::Ok().json(serde_json::to_value(&value).unwrap())
         }
-        None => HttpResponse::NotFound().json(json!({"message": "code not found"})),
+        None => HttpResponse::NotFound().json(json!({"message": "Code not found"})),
     }
 }
