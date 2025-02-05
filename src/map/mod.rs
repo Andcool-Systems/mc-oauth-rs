@@ -1,15 +1,10 @@
 use std::sync::{Arc, OnceLock};
-use serde::Serialize;
 use tokio::sync::{Mutex, MutexGuard};
+
+use crate::mojang::response::MojangResponse;
 pub mod expiring_map;
 
-#[derive(Clone, Serialize)]
-pub struct MinecraftData {
-    pub name: String,
-    pub uuid: String,
-}
-
-static MAP: OnceLock<Arc<Mutex<expiring_map::ExpiringMap<String, MinecraftData>>>> =
+static MAP: OnceLock<Arc<Mutex<expiring_map::ExpiringMap<String, MojangResponse>>>> =
     OnceLock::new();
 
 #[inline]
@@ -19,6 +14,6 @@ pub fn init_map() {
 }
 
 #[inline]
-pub async fn get_map() -> MutexGuard<'static, expiring_map::ExpiringMap<String, MinecraftData>> {
+pub async fn get_map() -> MutexGuard<'static, expiring_map::ExpiringMap<String, MojangResponse>> {
     MAP.get().expect("Map isn't initialized").lock().await
 }

@@ -29,7 +29,7 @@
             "label": "Build",
             "detail": "Build Rust application",
             "type": "shell",
-            "command": "cargo build --release --bin hub-rs",
+            "command": "cargo build --release",
             "group": {
                 "kind": "build",
                 "isDefault": false

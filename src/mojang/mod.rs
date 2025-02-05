@@ -20,15 +20,12 @@ pub async fn join(
     digest.update(keys.to_public_key().to_public_key_der()?.as_bytes());
     let hash = BigInt::from_signed_bytes_be(&digest.finalize()).to_str_radix(16);
 
-    println!("{:}", hash);
-
     let url = format!(
         "https://sessionserver.mojang.com/session/minecraft/hasJoined?username={}&serverId={}",
         session.nickname.clone().unwrap(),
         hash
     );
-
-    let response = reqwest::get(url.clone()).await?;
+    let response = reqwest::get(url).await?;
 
     if response.status().as_u16() != 200 {
         return Ok(None);
