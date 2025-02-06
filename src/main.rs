@@ -13,6 +13,7 @@ mod responses;
 
 use std::{
     net::{Ipv4Addr, SocketAddrV4},
+    str::FromStr,
     sync::Arc,
     time::Duration,
 };
@@ -43,7 +44,7 @@ async fn main() -> anyhow::Result<()> {
     init_logger(tracing::Level::INFO);
 
     // Load config from file
-    config::load("config.json").await?;
+    config::load("config.toml").await?;
     let config = config::get_config().await;
 
     // Generate key pair
@@ -52,19 +53,19 @@ async fn main() -> anyhow::Result<()> {
 
     // Start HTTP API
     let http = build_http_server(SocketAddrV4::new(
-        Ipv4Addr::new(0, 0, 0, 0),
-        config.api_port,
+        Ipv4Addr::from_str(&config.api.addr)?,
+        config.api.port,
     ));
     tokio::spawn(async move { http.await });
-    info!("API started on port {}", config.api_port);
+    info!("API started on port {}", config.api.port);
 
     // Bind TCP server
     let listener = TcpListener::bind(SocketAddrV4::new(
-        Ipv4Addr::new(0, 0, 0, 0),
-        config.server_port,
+        Ipv4Addr::from_str(&config.server.addr)?,
+        config.server.port,
     ))
     .await?;
-    info!("Server started on port {}", config.server_port);
+    info!("Server started on port {}", config.server.port);
 
     // Some graceful shutdown things
     let shutdown_signal = signal::ctrl_c();
@@ -97,7 +98,7 @@ async fn main() -> anyhow::Result<()> {
 
                         tokio::spawn(async move {
                             // Setting client timeout
-                            match timeout(Duration::from_secs(10), client_handler::handle(stream, keys)).await {
+                            match timeout(Duration::from_secs(config.server.timeout), client_handler::handle(stream, keys)).await {
                                 Ok(_) => info!("Connection from {} closed", addr),
                                 Err(e) => error!("Client exceptionally closed connection: {}", e)
                             }

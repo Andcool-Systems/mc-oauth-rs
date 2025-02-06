@@ -1,0 +1,24 @@
+[api]
+addr = "0.0.0.0"
+port = 8008
+code_life_time = 300
+
+[server]
+addr = "0.0.0.0"
+port = 25566
+timeout = 10
+
+[server.config]
+protocol = 0
+version = "1.21"
+auth_url = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username={{NAME}}&serverId={{HASH}}"
+
+[server.status]
+description = "§6mc-oauth.andcool.ru"
+players_max = 0
+players_online = 0
+icon_path = "server_icon.png"
+
+[messages]
+success = "Hello, §6{{NAME}}§r! Your code is: §a{{CODE}}"
+bad_session = "§cFailed to login: Invalid session (Try restarting your game and the launcher)"

@@ -58,8 +58,9 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                     disconnect::send(
                                         &mut stream,
                                         session,
-                                        "§cFailed to login: Invalid session (Try restarting your game and the launcher)".to_string()
-                                    ).await?;
+                                        config.messages.bad_session.clone(),
+                                    )
+                                    .await?;
                                     break;
                                 }
                                 let player_data = player_data.unwrap();
@@ -70,7 +71,7 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                 map.insert(
                                     code.clone(),
                                     player_data.clone(),
-                                    Duration::from_secs(config.code_life_time),
+                                    Duration::from_secs(config.api.code_life_time),
                                 )
                                 .await;
 
@@ -78,7 +79,12 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                 disconnect::send(
                                     &mut stream,
                                     session,
-                                    format!("Hello, §6{}§r! Your code is: §a{}", player_data.name, code),
+                                    config
+                                        .messages
+                                        .success
+                                        .replace("{{NAME}}", &player_data.name)
+                                        .replace("{{UUID}}", &player_data.id)
+                                        .replace("{{CODE}}", &code),
                                 )
                                 .await?;
 

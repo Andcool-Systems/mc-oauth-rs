@@ -14,11 +14,17 @@ pub async fn load(path: &str) -> Result<()> {
         .await
         .expect("Couldn't load config file");
 
-    let mut config: types::Config =
-        serde_json::from_str(&file).expect("Couldn't parse config json");
-    match server_icon::load(&config.icon_path).await {
+    let mut config: types::Config  = match toml::from_str(&file) {
+        Ok(config) => config,
+        Err(err) => {
+            panic!("Couldn't parse config: {}", err.message())
+        }
+    };
+    
+    //let mut config: types::Config = toml::from_str(&file);
+    match server_icon::load(&config.server.status.icon_path).await {
         Ok(base64) => config.image = Some(format!("data:image/png;base64,{}", base64)),
-        Err(e) => warn!("Error loading server icon: {}", e)
+        Err(e) => warn!("Error loading server icon: {}", e),
     }
 
     CONFIG.set(config).expect("Couldn't load config");

@@ -1,35 +1,88 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Config {
-    /// Minecraft server port (Minecraft's default port is `25565`)
-    pub server_port: u16,
+    /// API config
+    pub api: API,
 
-    /// API port
-    pub api_port: u16,
+    /// Minecraft server config
+    pub server: Server,
 
-    /// Display count of max server players
-    pub players_max: usize,
-
-    /// Display count of max server players
-    pub players_online: usize,
-
-    /// Server protocol version (0 for auto)
-    pub proto_ver: usize,
-
-    /// Server version string (e.g. 1.20.5)
-    pub server_ver: String,
-
-    /// Server description (you can use a `§` codes)
-    pub motd: String,
-
-    /// Assigned 6-digit code life time in seconds
-    pub code_life_time: u64,
-
-    /// Path to the server icon
-    pub icon_path: String,
+    /// Messages config
+    pub messages: Messages,
 
     #[serde(skip)]
     /// Base 64 encoded server icon
     pub image: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct API {
+    /// API address
+    pub addr: String,
+
+    /// API port
+    pub port: u16,
+
+    /// Life time of assigned code
+    pub code_life_time: u64,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Server {
+    /// Server address
+    pub addr: String,
+
+    /// Server port
+    pub port: u16,
+
+    /// Server connection timeout
+    pub timeout: u64,
+
+    /// Minecraft server config
+    pub config: ServerConfig,
+
+    /// Server list ping config
+    pub status: ServerStatus,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ServerConfig {
+    /// Protocol version (`0` for auto)
+    pub protocol: usize,
+
+    /// Minecraft version string (e.g. `1.20.1`)
+    pub version: String,
+
+    /// Session Auth URL  
+    /// `{{NAME}}` in string will be replaced to client nickname  
+    /// `{{HASH}}` will be replaced to generated client hash
+    pub auth_url: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ServerStatus {
+    /// Server description (you can use MOTD)
+    pub description: String,
+
+    /// Max players count, displayed in server list
+    pub players_max: usize,
+
+    /// Online players count, displayed in server list
+    pub players_online: usize,
+
+    /// Path to the server icon
+    pub icon_path: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Messages {
+    /// Message for success auth  
+    /// `{{NAME}}` will be replaced to client nickname  
+    /// `{{UUID}}` will be replaced to client UUID  
+    /// `{{CODE}}` will be replaced to generated code
+    pub success: String,
+
+    /// Message for Mojang API error
+    pub bad_session: String,
 }
