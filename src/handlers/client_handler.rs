@@ -26,7 +26,10 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
         stream.readable().await?;
 
         match stream.try_read(&mut temp_buf) {
-            Ok(0) => break, // if client disconnected
+            Ok(0) => {
+                debug!("No more data to read. Exiting...");
+                break; // if client disconnected
+            }
             Ok(n) => {
                 buffer.put_slice(&temp_buf[..n]);
 
@@ -51,17 +54,19 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                 ping::handle_and_send(&mut stream, &mut buffer).await?
                             }
                             NextStateEnum::Login => {
+                                debug!("Received encryption response");
                                 encryption_response::handle(session, &mut buffer, keys.clone())?;
 
                                 let player_data = mojang::join(session, keys.clone()).await?;
                                 if player_data.is_none() {
+                                    debug!("Mojang error");
                                     disconnect::send(
                                         &mut stream,
                                         session,
                                         config.messages.bad_session.clone(),
                                     )
                                     .await?;
-                                    break;
+                                    return Ok(());
                                 }
                                 let player_data = player_data.unwrap();
                                 let map = get_map().await;
@@ -89,11 +94,11 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                                 .await?;
 
                                 info!("Created code {} for {}", code, player_data.name);
-                                break;
+                                return Ok(());
                             }
-                            NextStateEnum::Unknown => break,
+                            NextStateEnum::Unknown => return Ok(()),
                         },
-                        _ => break,
+                        _ => return Ok(()),
                     }
                 }
             }

@@ -1,5 +1,6 @@
 use anyhow::Result;
 use tokio::{io::AsyncWriteExt, net::TcpStream};
+use tracing::debug;
 
 use crate::{
     client_sessions::Session, encryption::encrypt_packet, packets::disconnect::DisconnectPacket,
@@ -16,5 +17,7 @@ pub async fn send(stream: &mut TcpStream, session: &mut Session, reason: String)
     stream.writable().await?;
     stream.write_all(&disconnect_packet).await?;
     stream.shutdown().await?;
+
+    debug!("Disconnected client with reason: {}", reason);
     Ok(())
 }
