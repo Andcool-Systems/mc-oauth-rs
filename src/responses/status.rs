@@ -28,6 +28,7 @@ pub async fn send(stream: &mut TcpStream, session: &mut Session) -> Result<()> {
         enforces_secure_chat: false,
     };
 
+    stream.writable().await?;
     stream
         .write_all(&status::StatusPacket::build(data)?)
         .await?;
