@@ -42,7 +42,7 @@ GET /code/<6-digit code>
     ]
 }
 ```
-*You can read more about the data inside `properties` [here](https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol_Encryption#Server).*
+*You can read more about the data inside `properties` [here]([https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol_Encryption#Server](https://minecraft.wiki/w/Mojang_API#Query_player's_skin_and_cape)).*
 
 > [!NOTE]
 > The code is valid for 5 minutes after issuance and can only be used once.
