@@ -3,7 +3,6 @@ mod byte_buf_utils;
 mod client_sessions;
 mod config;
 mod encryption;
-mod format;
 mod generators;
 mod handlers;
 mod map;
@@ -98,7 +97,10 @@ async fn main() -> anyhow::Result<()> {
 
                         tokio::spawn(async move {
                             // Setting client timeout
-                            match timeout(Duration::from_secs(config.server.timeout), client_handler::handle(stream, keys)).await {
+                            match timeout(
+                                Duration::from_secs(config.server.timeout),
+                                client_handler::handle(stream, keys)
+                            ).await {
                                 Ok(_) => info!("Connection from {} closed", addr),
                                 Err(e) => error!("Client exceptionally closed connection: {}", e)
                             }
