@@ -1,10 +1,6 @@
-// use std::collections::HashMap;
-// use std::net::SocketAddr;
-// use std::sync::Arc;
-// use tokio::sync::Mutex;
-
 use aes::Aes128;
 use cfb8::Encryptor;
+use uuid::Uuid;
 
 use crate::generators::keys::generate_verify_token;
 
@@ -21,6 +17,7 @@ pub struct Session {
     pub proto_ver: Option<usize>,
     pub next_state: NextStateEnum,
     pub nickname: Option<String>,
+    pub uuid: Option<Uuid>,
     pub secret: Option<Vec<u8>>, // Shared secret,
     pub verify_token: [u8; 4],
     pub cipher: Option<Encryptor<Aes128>>,
@@ -33,11 +30,10 @@ impl Session {
             proto_ver: None,
             next_state: NextStateEnum::Unknown,
             nickname: None,
+            uuid: None,
             secret: None,
             verify_token: generate_verify_token(),
             cipher: None,
         }
     }
 }
-
-//pub type SessionMap = Arc<Mutex<HashMap<SocketAddr, Session>>>;

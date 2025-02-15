@@ -1,5 +1,7 @@
+use anyhow::Error;
 use bytes::{Buf, BufMut, BytesMut};
 use std::io::{self, ErrorKind};
+use uuid::Uuid;
 
 pub fn read_utf8(buf: &mut BytesMut) -> io::Result<String> {
     let len = read_varint(buf)?;
@@ -75,4 +77,19 @@ pub fn read_unsigned_short(buf: &mut BytesMut) -> io::Result<u16> {
         ));
     }
     Ok(buf.get_u16())
+}
+
+pub fn try_get_uuid(buf: &mut BytesMut) -> anyhow::Result<Uuid> {
+    let len = buf.len();
+    if len < 16 {
+        return Err(Error::msg("Not enough data"));
+    }
+
+    if len > 16 {
+        buf.advance(len - 16); // Normalize uuid length
+    }
+
+    let mut bytes = [0u8; 16];
+    buf.copy_to_slice(&mut bytes);
+    Ok(uuid::Uuid::from_slice(&bytes)?)
 }

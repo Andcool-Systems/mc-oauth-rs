@@ -55,7 +55,8 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
                             }
                             NextStateEnum::Login => {
                                 debug!("Received encryption response");
-                                encryption_response::handle(session, &mut buffer, keys.clone())?;
+                                encryption_response::handle(session, &mut buffer, keys.clone())
+                                    .expect("Encryption response handling error");
 
                                 let player_data = mojang::join(session, keys.clone()).await?;
                                 if player_data.is_none() {

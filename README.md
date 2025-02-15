@@ -118,5 +118,8 @@ bad_session = "§cFailed to login: Invalid session (Try restarting your game and
 ### 🚀 Running
 After configuring, run the compiled binary file through the console.
 
+## Known issues
+- For Minecraft 1.19.* clients, encryption does not work correctly
+
 ---
 **Created by AndcoolSystems with ❤, 3 February, 2025**

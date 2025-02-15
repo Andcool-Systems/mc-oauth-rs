@@ -6,7 +6,7 @@ code_life_time = 300
 [server]
 addr = "0.0.0.0"
 port = 25566
-timeout = 10
+timeout = 20
 
 [server.config]
 protocol = 0

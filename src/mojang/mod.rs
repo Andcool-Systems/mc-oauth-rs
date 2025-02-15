@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use sha1::{Digest, Sha1};
+use tracing::debug;
 
 use crate::{client_sessions::Session, config};
 use rsa::pkcs8::EncodePublicKey;
@@ -20,6 +21,8 @@ pub async fn join(
     digest.update(keys.to_public_key().to_public_key_der()?.as_bytes());
     let hash = BigInt::from_signed_bytes_be(&digest.finalize()).to_str_radix(16);
 
+    debug!("Creating request to Mojang API with hash: {hash}");
+
     let config = config::get_config().await;
     let response = reqwest::get(
         config
@@ -30,6 +33,11 @@ pub async fn join(
             .replace("{{HASH}}", &hash),
     )
     .await?;
+
+    debug!(
+        "Mojang API responded with code: {}",
+        response.status().as_u16()
+    );
 
     if response.status().as_u16() != 200 {
         return Ok(None);
