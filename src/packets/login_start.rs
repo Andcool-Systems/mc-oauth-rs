@@ -13,10 +13,7 @@ impl LoginStartPacket {
     pub fn parse(buff: &mut BytesMut) -> anyhow::Result<Self> {
         Ok(Self {
             name: read_utf8(buff)?,
-            uuid: match try_get_uuid(buff) {
-                Ok(uuid) => Some(uuid),
-                Err(_) => None,
-            },
+            uuid: try_get_uuid(buff).ok()
         })
     }
 }
