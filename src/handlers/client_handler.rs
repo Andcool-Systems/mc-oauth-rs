@@ -18,7 +18,7 @@ use crate::{
 
 pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Result<()> {
     let mut buffer = BytesMut::new();
-    let session = &mut Session::new(); // Create session for current client
+    let session = &mut Session::new().await; // Create session for current client
     let config = get_config().await;
 
     loop {
@@ -111,13 +111,11 @@ pub async fn handle(mut stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Res
 }
 
 fn packet_available(buffer: &mut BytesMut) -> bool {
-    if buffer.len() == 0 {
+    if buffer.is_empty() {
         return false;
     }
-
     // Read packet length
-    match read_varint(buffer) {
-        Ok(packet_len) => buffer.len() >= packet_len,
-        Err(_) => false,
-    }
+    read_varint(buffer)
+        .map(|x| buffer.len() >= x)
+        .unwrap_or(false)
 }

@@ -48,6 +48,9 @@ pub struct Server {
 
 #[derive(Deserialize, Debug)]
 pub struct ServerConfig {
+    /// Minecraft server name
+    pub server_name: String,
+
     /// Protocol version (`0` for auto)
     pub protocol: usize,
 

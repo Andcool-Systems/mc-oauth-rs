@@ -2,7 +2,7 @@ use aes::Aes128;
 use cfb8::Encryptor;
 use uuid::Uuid;
 
-use crate::generators::keys::generate_verify_token;
+use crate::{config::get_config, generators::keys::generate_verify_token};
 
 #[derive(Debug)]
 pub enum NextStateEnum {
@@ -24,9 +24,11 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new() -> Self {
+    pub async fn new() -> Self {
+        let config = get_config().await;
+
         Self {
-            server_id: "mc-oauth-rs".to_string(),
+            server_id: config.server.config.server_name.clone(),
             proto_ver: None,
             next_state: NextStateEnum::Unknown,
             nickname: None,

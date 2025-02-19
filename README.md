@@ -81,6 +81,8 @@ port = 25565
 timeout = 10
 
 [server.config]
+# Minecraft server name
+server_name = "mc-oauth-rs"
 # Protocol version (`0` for auto)
 protocol = 0
 # Minecraft version string
