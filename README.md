@@ -17,7 +17,7 @@ All you need to do is join a Minecraft server and get a 6-digit code, then enter
 - 🔒 The server only processes the authentication process and nothing more
 
 ## 💻 For Users
-Websites that use this service will ask you for a 6-digit code, which you can get by joining the Minecraft server `auth.mc-oauth.andcool.ru` (or others), then entering it on the website.  
+Websites that use this service will ask you for a 6-digit code, which you can get by joining the Minecraft server `mc-oauth.andcool.ru` (or others), then entering it on the website.  
 **The website developer will get access to your username, UUID, and skin.**
 
 ## 🛠️ For Developers
