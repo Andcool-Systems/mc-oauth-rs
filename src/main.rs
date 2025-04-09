@@ -1,6 +1,6 @@
 mod api;
 mod byte_buf_utils;
-mod client_sessions;
+mod client;
 mod config;
 mod encryption;
 mod generators;
@@ -18,8 +18,8 @@ use std::{
 };
 
 use api::build_http_server;
-use generators::keys::generate_key_pair;
-use handlers::client_handler;
+use client::MinecraftClient;
+use generators::generate_key_pair;
 use tokio::{net::TcpListener, sync::Notify};
 use tokio::{signal, time::timeout};
 use tracing::{error, info};
@@ -40,7 +40,7 @@ fn init_logger(level: tracing::Level) {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // Set up logger
-    init_logger(tracing::Level::INFO);
+    init_logger(tracing::Level::DEBUG);
 
     // Load config from file
     config::load("config.toml").await?;
@@ -92,14 +92,14 @@ async fn main() -> anyhow::Result<()> {
             result = listener.accept() => {
                 match result {
                     Ok((stream, addr)) => {
-                        let keys = keys.clone();
+                        let mut client = MinecraftClient::new(stream, keys.clone()).await;
                         info!("New connection from: {}", addr);
 
                         tokio::spawn(async move {
                             // Setting client timeout
                             match timeout(
                                 Duration::from_secs(config.server.timeout),
-                                client_handler::handle(stream, keys)
+                                client.run()
                             ).await {
                                 Ok(_) => info!("Connection from {} closed", addr),
                                 Err(e) => error!("Client exceptionally closed connection: {}", e)

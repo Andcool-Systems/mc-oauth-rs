@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use crate::{client_sessions::Session, packets::encryption_response::EncryptionResponsePacket};
+use crate::{client::Session, packets::encryption_response::EncryptionResponsePacket};
 use aes::{cipher::KeyIvInit, Aes128};
 use anyhow::Result;
 use bytes::BytesMut;
 
 use rsa::{Pkcs1v15Encrypt, RsaPrivateKey};
 
-pub fn handle(
+pub fn handle_encryption(
     session: &mut Session,
     buffer: &mut BytesMut,
     keys: Arc<rsa::RsaPrivateKey>,

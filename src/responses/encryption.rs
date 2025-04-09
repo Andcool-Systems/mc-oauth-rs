@@ -3,9 +3,9 @@ use rsa::pkcs8::EncodePublicKey;
 use std::sync::Arc;
 use tokio::{io::AsyncWriteExt, net::TcpStream};
 
-use crate::{client_sessions::Session, packets::encryption_request::EncryptionRequestPacket};
+use crate::{client::Session, packets::encryption_request::EncryptionRequestPacket};
 
-pub async fn send(
+pub async fn send_encryption(
     stream: &mut TcpStream,
     keys: Arc<rsa::RsaPrivateKey>,
     session: &mut Session,

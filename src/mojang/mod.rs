@@ -1,15 +1,11 @@
 pub mod response;
-
-use std::sync::Arc;
-
+use crate::{client::Session, config};
 use anyhow::Result;
-use sha1::{Digest, Sha1};
-use tracing::debug;
-
-use crate::{client_sessions::Session, config};
-use rsa::pkcs8::EncodePublicKey;
-
 use num_bigint::BigInt;
+use rsa::pkcs8::EncodePublicKey;
+use sha1::{Digest, Sha1};
+use std::sync::Arc;
+use tracing::debug;
 
 pub async fn join(
     session: &mut Session,

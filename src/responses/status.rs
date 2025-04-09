@@ -3,9 +3,9 @@ use anyhow::Result;
 use serde_json::json;
 use tokio::{io::AsyncWriteExt, net::TcpStream};
 
-use crate::{client_sessions::Session, config::get_config, packets::status};
+use crate::{client::Session, config::get_config, packets::status};
 
-pub async fn send(stream: &mut TcpStream, session: &mut Session) -> Result<()> {
+pub async fn send_status(stream: &mut TcpStream, session: &mut Session) -> Result<()> {
     let config = get_config().await;
     let proto_ver = if config.server.config.protocol == 0 {
         session.proto_ver.unwrap()

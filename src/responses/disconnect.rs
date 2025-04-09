@@ -1,12 +1,13 @@
+use crate::{client::Session, encryption::encrypt_packet, packets::disconnect::DisconnectPacket};
 use anyhow::Result;
 use tokio::{io::AsyncWriteExt, net::TcpStream};
 use tracing::debug;
 
-use crate::{
-    client_sessions::Session, encryption::encrypt_packet, packets::disconnect::DisconnectPacket,
-};
-
-pub async fn send(stream: &mut TcpStream, session: &mut Session, reason: String) -> Result<()> {
+pub async fn send_disconnect(
+    stream: &mut TcpStream,
+    session: &mut Session,
+    reason: String,
+) -> Result<()> {
     let mut disconnect_packet = DisconnectPacket {
         reason: format!(r#"{{"text":"{}"}}"#, reason),
     }

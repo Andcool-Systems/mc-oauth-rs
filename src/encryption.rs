@@ -1,6 +1,5 @@
+use crate::client::Session;
 use bytes::BytesMut;
-
-use crate::client_sessions::Session;
 
 pub fn encrypt_packet(data: &mut BytesMut, session: &mut Session) {
     use aes::cipher::{generic_array::GenericArray, BlockEncryptMut, BlockSizeUser};
