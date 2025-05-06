@@ -17,7 +17,7 @@ use aes::Aes128;
 use anyhow::{anyhow, Result};
 use bytes::{BufMut, BytesMut};
 use cfb8::Encryptor;
-use std::{sync::Arc, time::Duration};
+use std::{net::SocketAddr, sync::Arc, time::Duration};
 use tokio::net::TcpStream;
 use tracing::{debug, error, info};
 use uuid::Uuid;
@@ -39,10 +39,11 @@ pub struct Session {
     pub secret: Option<Vec<u8>>, // Shared secret,
     pub verify_token: [u8; 4],
     pub cipher: Option<Encryptor<Aes128>>,
+    pub addr: SocketAddr,
 }
 
 impl Session {
-    pub async fn new() -> Self {
+    pub async fn new(addr: SocketAddr) -> Self {
         let config = get_config().await;
 
         Self {
@@ -54,6 +55,7 @@ impl Session {
             secret: None,
             verify_token: generate_verify_token(),
             cipher: None,
+            addr,
         }
     }
 }
@@ -69,7 +71,7 @@ pub struct MinecraftClient {
 impl MinecraftClient {
     pub async fn new(stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Self {
         Self {
-            session: Session::new().await,
+            session: Session::new(stream.peer_addr().unwrap()).await,
             buffer: BytesMut::new(),
             config: get_config().await,
             stream,
@@ -81,7 +83,7 @@ impl MinecraftClient {
         match self._run().await {
             Ok(_) => info!(
                 "Connection from {:?} closed successfully",
-                self.stream.peer_addr().unwrap()
+                self.session.addr
             ),
             Err(e) => error!("Internal error occurred: {}", e),
         }
