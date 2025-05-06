@@ -19,7 +19,7 @@ use bytes::{BufMut, BytesMut};
 use cfb8::Encryptor;
 use std::{sync::Arc, time::Duration};
 use tokio::net::TcpStream;
-use tracing::{debug, info};
+use tracing::{debug, error, info};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -77,7 +77,17 @@ impl MinecraftClient {
         }
     }
 
-    pub async fn run(&mut self) -> Result<()> {
+    pub async fn run(&mut self) {
+        match self._run().await {
+            Ok(_) => info!(
+                "Connection from {:?} closed successfully",
+                self.stream.peer_addr().unwrap()
+            ),
+            Err(e) => error!("Internal error occurred: {}", e),
+        }
+    }
+
+    pub async fn _run(&mut self) -> Result<()> {
         loop {
             let mut temp_buf = vec![0; 1024];
             self.stream.readable().await?;
