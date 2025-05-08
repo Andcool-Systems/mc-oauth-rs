@@ -133,7 +133,7 @@ impl MinecraftClient {
                 handle_login_start(&mut self.session, &mut self.buffer)?;
                 send_encryption(&mut self.stream, self.keys.clone(), &mut self.session).await?;
             }
-            NextStateEnum::Unknown => handle_handshake(&mut self.session, &mut self.buffer)?, // Handle handshake
+            NextStateEnum::Unknown => handle_handshake(self).await?, // Handle handshake
         }
 
         Ok(())

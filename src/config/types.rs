@@ -44,6 +44,9 @@ pub struct Server {
 
     /// Server list ping config
     pub status: ServerStatus,
+
+    /// Proxy address (optional)
+    pub server_ip: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -88,4 +91,7 @@ pub struct Messages {
 
     /// Message for Mojang API error
     pub bad_session: String,
+
+    /// Using a proxy
+    pub using_proxy: String,
 }

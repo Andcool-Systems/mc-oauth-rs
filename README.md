@@ -1,7 +1,7 @@
 # Minecraft OAuth Provider
 
 ## 🚀 Description
-MC-oAuth-rs is an all-in-one solution that allows users to log in to a website using their Minecraft account without entering their username or password.  
+MC-OAuth-rs is an all-in-one solution that allows users to log in to a website using their Minecraft account without entering their username or password.  
 
 It’s secure, simple, and user-friendly, enabling logins only for users with a licensed Minecraft account.  
 The service supports Minecraft versions above 1.8.
@@ -67,26 +67,38 @@ For the server to work, create a `config.toml` file in the same directory as the
 [api]
 # API address
 addr = "0.0.0.0"
+
 # API port
 port = 8008
+
 # Life time of assigned code
 code_life_time = 300
 
 [server]
 # Minecraft server address
 addr = "0.0.0.0"
+
 # Minecraft server port
 port = 25565
+
 # Server connection timeout
+# Sets the maximum time a client can stay connected to the server. Used to prevent idle or junk connections.
 timeout = 10
+
+# [Optional] This setting defines the server IP to prevent proxy bypass or spoofing.
+server_ip = "localhost"
 
 [server.config]
 # Minecraft server name
 server_name = "mc-oauth-rs"
+
 # Protocol version (`0` for auto)
+# Used only during the server ping and is ignored when trying to connect. If set to 0, the protocol version that the client uses will be applied.
 protocol = 0
+
 # Minecraft version string
 version = "1.21"
+
 # Session Auth URL  
 # `{{NAME}}` in string will be replaced by the client nickname  
 # `{{HASH}}` will be replaced by the generated client hash
@@ -95,11 +107,15 @@ auth_url = "https://sessionserver.mojang.com/session/minecraft/hasJoined?usernam
 [server.status]
 # Server description (you can use MOTD)
 description = "§6mc-oauth.andcool.ru"
+
 # Max players count, displayed in server list
 players_max = 0
+
 # Online players count, displayed in server list
 players_online = 0
+
 # Path to the server icon (can be empty)
+# Should be in .png format and 64x64 pixels in size
 icon_path = "server_icon.png"
 
 [messages]
@@ -108,14 +124,14 @@ icon_path = "server_icon.png"
 # `{{UUID}}` will be replaced by the client UUID  
 # `{{CODE}}` will be replaced by the generated code
 success = "Hello, §6{{NAME}}§r! Your code is: §a{{CODE}}"
+
 # Message for Mojang API error
 bad_session = "§cFailed to login: Invalid session (Try restarting your game and the launcher)"
+
+# Message for bad server address (`server_ip` setting)
+using_proxy = "§cYou are using a proxy!"
 ```
 
-> [!NOTE]
-> The server icon should be in `.png` format and 64x64 pixels in size.  
-> `timeout` in the config sets the **maximum** time that the client can be connected before the server disconnects.  
-> `protocol` is used only during the server ping and is ignored when trying to connect. If set to `0`, the protocol version that the client uses will be applied.
 
 ### 🚀 Running
 After configuring, run the compiled binary file through the console.
