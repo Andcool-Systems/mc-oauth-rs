@@ -85,7 +85,8 @@ port = 25565
 # Sets the maximum time a client can stay connected to the server. Used to prevent idle or junk connections.
 timeout = 10
 
-# [Optional] This setting defines the server IP to prevent proxy bypass or spoofing.
+# [Optional] This parameter defines the server host to which the clients connect.
+# This is necessary to prevent proxy bypass or spoofing.
 server_ip = "localhost"
 
 [server.config]
