@@ -1,12 +1,9 @@
+use crate::byte_buf_utils::{add_size, write_varint};
 use anyhow::Result;
 use bytes::{BufMut, BytesMut};
 
-use crate::byte_buf_utils::{add_size, write_varint};
-
-
-#[allow(dead_code)]
 pub struct PingPacket {
-    pub payload: i64
+    pub payload: i64,
 }
 
 impl PingPacket {

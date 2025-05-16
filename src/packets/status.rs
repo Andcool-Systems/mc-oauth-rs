@@ -1,9 +1,8 @@
+use crate::byte_buf_utils::{add_size, write_utf8, write_varint};
 use anyhow::Result;
 use bytes::BytesMut;
 use serde::Serialize;
 use serde_json::Value;
-
-use crate::byte_buf_utils::{add_size, write_utf8, write_varint};
 
 pub struct StatusPacket {}
 

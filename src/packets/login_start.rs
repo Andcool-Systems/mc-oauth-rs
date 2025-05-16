@@ -1,7 +1,6 @@
+use crate::byte_buf_utils::{read_utf8, try_get_uuid};
 use bytes::BytesMut;
 use uuid::Uuid;
-
-use crate::byte_buf_utils::{read_utf8, try_get_uuid};
 
 pub struct LoginStartPacket {
     pub name: String,

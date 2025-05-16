@@ -79,6 +79,10 @@ pub fn read_unsigned_short(buf: &mut BytesMut) -> io::Result<u16> {
     Ok(buf.get_u16())
 }
 
+/*
+For some reason, not all Minecraft clients send their UUID correctly,
+so you have to return Result, since parsing is not always possible.
+*/
 pub fn try_get_uuid(buf: &mut BytesMut) -> anyhow::Result<Uuid> {
     let len = buf.len();
     if len < 16 {

@@ -15,6 +15,7 @@ pub async fn handle_handshake(client: &mut MinecraftClient) -> Result<()> {
         _ => NextStateEnum::Unknown,
     };
 
+    // Check client's connecting hostname
     client.session.proto_ver = Some(handshake.proto_ver);
     if let Some(server_ip) = &client.config.server.server_ip {
         if server_ip.ne(&handshake.server_addr) {
