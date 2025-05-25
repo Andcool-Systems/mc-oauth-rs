@@ -2,11 +2,11 @@ use crate::byte_buf_utils::{add_size, write_varint};
 use anyhow::Result;
 use bytes::{BufMut, BytesMut};
 
-pub struct PingPacket {
+pub struct PongPacket {
     pub payload: i64,
 }
 
-impl PingPacket {
+impl PongPacket {
     /**
     Build packet for sending over network
     */

@@ -145,7 +145,7 @@ impl MinecraftServer {
             NextStateEnum::Status => {
                 // Handle ping request
                 let payload = self.buffer.get_i64();
-                self.send_ping(payload).await?
+                self.send_pong(payload).await?
             }
             NextStateEnum::Login => {
                 debug!("Received encryption response");

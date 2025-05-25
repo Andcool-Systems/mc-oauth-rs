@@ -1,14 +1,14 @@
 use anyhow::Result;
 
-use crate::{packets::ping::PingPacket, server::MinecraftServer};
+use crate::{packets::pong::PongPacket, server::MinecraftServer};
 use tokio::io::AsyncWriteExt;
 
 impl MinecraftServer {
     /**
-    Send ping response
+    Send pong response
     */
-    pub async fn send_ping(&mut self, payload: i64) -> Result<()> {
-        let packet = PingPacket { payload };
+    pub async fn send_pong(&mut self, payload: i64) -> Result<()> {
+        let packet = PongPacket { payload };
 
         self.stream.writable().await?;
         self.stream.write_all(&packet.build()?).await?;

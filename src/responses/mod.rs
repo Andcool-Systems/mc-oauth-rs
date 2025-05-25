@@ -1,4 +1,4 @@
 pub mod disconnect;
 pub mod encryption;
-pub mod ping;
+pub mod pong;
 pub mod status;
