@@ -1,9 +1,13 @@
-use crate::{client::Session, packets::login_start::LoginStartPacket};
-use bytes::BytesMut;
+use crate::{packets::login_start::LoginStartPacket, server::MinecraftServer};
 
-pub fn handle_login_start(session: &mut Session, buff: &mut BytesMut) -> anyhow::Result<()> {
-    let packet = LoginStartPacket::parse(buff)?;
-    session.nickname = Some(packet.name);
-    session.uuid = packet.uuid;
-    Ok(())
+impl MinecraftServer {
+    /**
+    Handle login start packet from client
+    */
+    pub fn handle_login_start(&mut self) -> anyhow::Result<()> {
+        let packet = LoginStartPacket::parse(&mut self.buffer)?;
+        self.session.nickname = Some(packet.name);
+        self.session.uuid = packet.uuid;
+        Ok(())
+    }
 }

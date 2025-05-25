@@ -2,16 +2,8 @@ use crate::{
     byte_buf_utils::read_varint,
     config::{self, get_config},
     generators::{generate_code, generate_verify_token},
-    handlers::{
-        encryption_response::handle_encryption, handshake::handle_handshake,
-        login_start::handle_login_start,
-    },
     map::get_map,
     mojang,
-    responses::{
-        disconnect::send_disconnect, encryption::send_encryption, ping::handle_ping,
-        status::send_status,
-    },
 };
 use aes::Aes128;
 use anyhow::{anyhow, Result};
@@ -60,7 +52,7 @@ impl Session {
     }
 }
 
-pub struct MinecraftClient {
+pub struct MinecraftServer {
     pub session: Session,
     pub buffer: BytesMut,
     pub config: &'static config::types::Config,
@@ -68,15 +60,15 @@ pub struct MinecraftClient {
     pub keys: Arc<rsa::RsaPrivateKey>,
 }
 
-impl MinecraftClient {
-    pub async fn new(stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Self {
-        Self {
-            session: Session::new(stream.peer_addr().unwrap()).await,
+impl MinecraftServer {
+    pub async fn new(stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Result<Self> {
+        Ok(Self {
+            session: Session::new(stream.peer_addr()?).await,
             buffer: BytesMut::new(),
             config: get_config().await,
             stream,
             keys,
-        }
+        })
     }
 
     pub async fn run(&mut self) {
@@ -91,8 +83,8 @@ impl MinecraftClient {
 
     pub async fn _run(&mut self) -> Result<()> {
         loop {
-            let mut temp_buf = vec![0; 1024];
             self.stream.readable().await?;
+            let mut temp_buf = vec![0; 1024];
 
             match self.stream.try_read(&mut temp_buf) {
                 Ok(0) => {
@@ -110,6 +102,9 @@ impl MinecraftClient {
         Ok(())
     }
 
+    /**
+    Packet handler
+    */
     async fn handle_packet(&mut self) -> Result<()> {
         while self.packet_available() {
             let packet_id = read_varint(&mut self.buffer)?;
@@ -125,48 +120,53 @@ impl MinecraftClient {
         Ok(())
     }
 
+    /**
+    Handle packet with id 0
+    */
     async fn handle_packet_0(&mut self) -> Result<()> {
         match self.session.next_state {
-            NextStateEnum::Status => send_status(&mut self.stream, &mut self.session).await?, // Send status response
+            NextStateEnum::Status => self.send_status().await?, // Send status response
             NextStateEnum::Login => {
                 // Handle login start
-                handle_login_start(&mut self.session, &mut self.buffer)?;
-                send_encryption(&mut self.stream, self.keys.clone(), &mut self.session).await?;
+                self.handle_login_start()?;
+                self.send_encryption().await?;
             }
-            NextStateEnum::Unknown => handle_handshake(self).await?, // Handle handshake
+            NextStateEnum::Unknown => self.handle_handshake().await?, // Handle handshake
         }
 
         Ok(())
     }
 
+    /**
+    Handle packet with id 1
+    */
     async fn handle_packet_1(&mut self) -> Result<()> {
         match self.session.next_state {
             NextStateEnum::Status => {
                 // Handle ping request
-                handle_ping(&mut self.stream, &mut self.buffer).await?
+                self.handle_ping().await?
             }
-            NextStateEnum::Login => self.handle_encryption_response().await?,
+            NextStateEnum::Login => {
+                debug!("Received encryption response");
+                self.handle_encryption()?;
+                self.auth_client().await?
+            }
             NextStateEnum::Unknown => return Err(anyhow!("Received unknown packet")),
         }
         Ok(())
     }
 
-    async fn handle_encryption_response(&mut self) -> Result<()> {
-        debug!("Received encryption response");
-        handle_encryption(&mut self.session, &mut self.buffer, self.keys.clone())?;
+    async fn auth_client(&mut self) -> Result<()> {
         let player_data = mojang::join(&mut self.session, self.keys.clone()).await?;
 
         if player_data.is_none() {
             debug!("Mojang API error");
-            send_disconnect(
-                &mut self.stream,
-                &mut self.session,
-                self.config.messages.bad_session.clone(),
-            )
-            .await?;
+            self.send_disconnect(self.config.messages.bad_session.clone())
+                .await?;
             return Err(anyhow!("Mojang API error"));
         }
 
+        // HA-HA: Unwrap is safe, because we already checked for none above
         let player_data = player_data.unwrap();
         let map = get_map().await;
         let code = generate_code(6); // Generate 6-digit code
@@ -180,9 +180,7 @@ impl MinecraftClient {
         .await;
 
         // Disconnect client with code
-        send_disconnect(
-            &mut self.stream,
-            &mut self.session,
+        self.send_disconnect(
             self.config
                 .messages
                 .success

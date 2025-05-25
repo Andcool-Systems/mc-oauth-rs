@@ -1,6 +1,5 @@
 mod api;
 mod byte_buf_utils;
-mod client;
 mod config;
 mod encryption;
 mod generators;
@@ -9,6 +8,7 @@ mod map;
 mod mojang;
 mod packets;
 mod responses;
+mod server;
 
 use std::{
     net::{Ipv4Addr, SocketAddrV4},
@@ -18,8 +18,8 @@ use std::{
 };
 
 use api::build_http_server;
-use client::MinecraftClient;
 use generators::generate_key_pair;
+use server::MinecraftServer;
 use tokio::{net::TcpListener, sync::Notify};
 use tokio::{signal, time::timeout};
 use tracing::{error, info};
@@ -54,7 +54,8 @@ async fn main() -> anyhow::Result<()> {
     let http = build_http_server(SocketAddrV4::new(
         Ipv4Addr::from_str(&config.api.addr)?,
         config.api.port,
-    ));
+    ))?;
+
     tokio::spawn(async move { http.await });
     info!("API started on port {}", config.api.port);
 
@@ -92,7 +93,7 @@ async fn main() -> anyhow::Result<()> {
             result = listener.accept() => {
                 match result {
                     Ok((stream, addr)) => {
-                        let mut client = MinecraftClient::new(stream, keys.clone()).await;
+                        let mut client = MinecraftServer::new(stream, keys.clone()).await?;
                         info!("New connection from: {}", addr);
 
                         tokio::spawn(async move {

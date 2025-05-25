@@ -7,6 +7,9 @@ pub struct PingPacket {
 }
 
 impl PingPacket {
+    /**
+    Build packet for sending over network
+    */
     pub fn build(&self) -> Result<BytesMut> {
         let mut buffer = BytesMut::new();
 

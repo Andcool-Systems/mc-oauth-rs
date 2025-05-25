@@ -1,17 +1,20 @@
-use crate::client::Session;
+use crate::server::MinecraftServer;
+use aes::cipher::AsyncStreamCipher;
 use bytes::BytesMut;
 
-pub fn encrypt_packet(data: &mut BytesMut, session: &mut Session) {
-    use aes::cipher::{generic_array::GenericArray, BlockEncryptMut, BlockSizeUser};
-    use aes::Aes128;
+impl MinecraftServer {
+    /**
+    Encrypt minecraft packet in place
 
-    if session.cipher.is_none() {
-        return;
-    }
+    If session cipher is not set — skip the encryption
+    */
+    pub fn encrypt_packet(&mut self, data: &mut BytesMut) {
+        if self.session.cipher.is_none() {
+            return;
+        }
 
-    let mut cipher = session.cipher.clone().unwrap();
-    for chunk in data.chunks_mut(cfb8::Encryptor::<Aes128>::block_size()) {
-        let gen_arr = GenericArray::from_mut_slice(chunk);
-        cipher.encrypt_block_mut(gen_arr);
+        if let Some(cipher) = &mut self.session.cipher {
+            cipher.clone().encrypt(data);
+        }
     }
 }

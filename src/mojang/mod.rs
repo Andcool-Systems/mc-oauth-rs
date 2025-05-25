@@ -1,6 +1,6 @@
 pub mod response;
-use crate::{client::Session, config};
-use anyhow::Result;
+use crate::{config, server::Session};
+use anyhow::{Context, Result};
 use num_bigint::BigInt;
 use rsa::pkcs8::EncodePublicKey;
 use sha1::{Digest, Sha1};
@@ -13,7 +13,13 @@ pub async fn join(
 ) -> Result<Option<response::MojangResponse>> {
     let mut digest = Sha1::new();
     digest.update(session.server_id.as_bytes());
-    digest.update(session.secret.clone().unwrap().as_slice());
+    digest.update(
+        session
+            .secret
+            .clone()
+            .context("Session secret not set")?
+            .as_slice(),
+    );
     digest.update(keys.to_public_key().to_public_key_der()?.as_bytes());
     let hash = BigInt::from_signed_bytes_be(&digest.finalize()).to_str_radix(16);
 
@@ -25,7 +31,13 @@ pub async fn join(
             .server
             .config
             .auth_url
-            .replace("{{NAME}}", &session.nickname.clone().unwrap())
+            .replace(
+                "{{NAME}}",
+                &session
+                    .nickname
+                    .clone()
+                    .context("Client's nickname not set")?,
+            )
             .replace("{{HASH}}", &hash),
     )
     .await?;

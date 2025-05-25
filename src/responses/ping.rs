@@ -1,14 +1,19 @@
 use anyhow::Result;
 
-use crate::packets::ping::PingPacket;
-use bytes::{Buf, BytesMut};
-use tokio::{io::AsyncWriteExt, net::TcpStream};
+use crate::{packets::ping::PingPacket, server::MinecraftServer};
+use bytes::Buf;
+use tokio::io::AsyncWriteExt;
 
-pub async fn handle_ping(stream: &mut TcpStream, buff: &mut BytesMut) -> Result<()> {
-    let payload = buff.get_i64();
-    let packet = PingPacket { payload };
+impl MinecraftServer {
+    /**
+    Handle ping and send response
+    */
+    pub async fn handle_ping(&mut self) -> Result<()> {
+        let payload = self.buffer.get_i64();
+        let packet = PingPacket { payload };
 
-    stream.writable().await?;
-    stream.write_all(&packet.build()?).await?;
-    Ok(())
+        self.stream.writable().await?;
+        self.stream.write_all(&packet.build()?).await?;
+        Ok(())
+    }
 }
