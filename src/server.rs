@@ -7,7 +7,7 @@ use crate::{
 };
 use aes::Aes128;
 use anyhow::{anyhow, Result};
-use bytes::{BufMut, BytesMut};
+use bytes::{Buf, BufMut, BytesMut};
 use cfb8::Encryptor;
 use std::{net::SocketAddr, sync::Arc, time::Duration};
 use tokio::net::TcpStream;
@@ -81,7 +81,7 @@ impl MinecraftServer {
         }
     }
 
-    pub async fn _run(&mut self) -> Result<()> {
+    async fn _run(&mut self) -> Result<()> {
         loop {
             self.stream.readable().await?;
             let mut temp_buf = vec![0; 1024];
@@ -144,7 +144,8 @@ impl MinecraftServer {
         match self.session.next_state {
             NextStateEnum::Status => {
                 // Handle ping request
-                self.handle_ping().await?
+                let payload = self.buffer.get_i64();
+                self.send_ping(payload).await?
             }
             NextStateEnum::Login => {
                 debug!("Received encryption response");
@@ -159,15 +160,14 @@ impl MinecraftServer {
     async fn auth_client(&mut self) -> Result<()> {
         let player_data = mojang::join(&mut self.session, self.keys.clone()).await?;
 
-        if player_data.is_none() {
-            debug!("Mojang API error");
-            self.send_disconnect(self.config.messages.bad_session.clone())
-                .await?;
-            return Err(anyhow!("Mojang API error"));
-        }
-
-        // HA-HA: Unwrap is safe, because we already checked for none above
-        let player_data = player_data.unwrap();
+        let player_data = match player_data {
+            Some(x) => x,
+            None => {
+                self.send_disconnect(self.config.messages.bad_session.clone())
+                    .await?;
+                return Err(anyhow!("Mojang API error"));
+            }
+        };
         let map = get_map().await;
         let code = generate_code(6); // Generate 6-digit code
 

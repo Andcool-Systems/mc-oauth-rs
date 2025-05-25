@@ -1,15 +1,13 @@
 use anyhow::Result;
 
 use crate::{packets::ping::PingPacket, server::MinecraftServer};
-use bytes::Buf;
 use tokio::io::AsyncWriteExt;
 
 impl MinecraftServer {
     /**
-    Handle ping and send response
+    Send ping response
     */
-    pub async fn handle_ping(&mut self) -> Result<()> {
-        let payload = self.buffer.get_i64();
+    pub async fn send_ping(&mut self, payload: i64) -> Result<()> {
         let packet = PingPacket { payload };
 
         self.stream.writable().await?;

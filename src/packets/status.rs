@@ -4,14 +4,20 @@ use bytes::BytesMut;
 use serde::Serialize;
 use serde_json::Value;
 
-pub struct StatusPacket {}
+pub struct StatusPacket {
+    data: StatusData,
+}
 
 impl StatusPacket {
-    pub fn build(data: StatusData) -> Result<BytesMut> {
+    pub fn new(data: StatusData) -> Self {
+        Self { data }
+    }
+
+    pub fn build(&self) -> Result<BytesMut> {
         let mut buffer = BytesMut::new();
 
         write_varint(&mut buffer, 0x00); // Packet id
-        write_utf8(&mut buffer, &serde_json::to_string(&data)?)?;
+        write_utf8(&mut buffer, &serde_json::to_string(&self.data)?)?;
 
         Ok(add_size(&buffer))
     }

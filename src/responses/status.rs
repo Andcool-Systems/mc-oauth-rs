@@ -1,6 +1,9 @@
+use crate::{
+    config::get_config,
+    packets::status::{self, StatusData, StatusPacket},
+    server::MinecraftServer,
+};
 use anyhow::Result;
-
-use crate::{config::get_config, packets::status, server::MinecraftServer};
 use serde_json::json;
 use tokio::io::AsyncWriteExt;
 
@@ -19,7 +22,7 @@ impl MinecraftServer {
             config.server.config.protocol
         };
 
-        let data = status::StatusData {
+        let packet = StatusPacket::new(StatusData {
             version: status::Version {
                 name: config.server.config.version.clone(),
                 protocol: proto_ver,
@@ -32,12 +35,10 @@ impl MinecraftServer {
             description: json!({"text": config.server.status.description.clone()}),
             favicon: config.image.clone(),
             enforces_secure_chat: false,
-        };
+        });
 
         self.stream.writable().await?;
-        self.stream
-            .write_all(&status::StatusPacket::build(data)?)
-            .await?;
+        self.stream.write_all(&packet.build()?).await?;
         Ok(())
     }
 }

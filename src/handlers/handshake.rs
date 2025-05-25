@@ -14,6 +14,7 @@ impl MinecraftServer {
     pub async fn handle_handshake(&mut self) -> Result<()> {
         let handshake = HandshakePacket::parse(&mut self.buffer)?;
 
+        self.session.proto_ver = Some(handshake.proto_ver);
         self.session.next_state = match handshake.next_state {
             1 => NextStateEnum::Status,
             2 => NextStateEnum::Login,
@@ -21,7 +22,6 @@ impl MinecraftServer {
         };
 
         // Check client's connecting hostname
-        self.session.proto_ver = Some(handshake.proto_ver);
         if let Some(server_ip) = &self.config.server.server_ip {
             if server_ip.ne(&handshake.server_addr) {
                 self.send_disconnect(self.config.messages.using_proxy.clone())
