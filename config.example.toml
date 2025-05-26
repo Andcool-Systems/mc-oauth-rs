@@ -2,6 +2,7 @@
 addr = "0.0.0.0"
 port = 8008
 code_life_time = 300
+code_length = 6
 
 [server]
 addr = "0.0.0.0"

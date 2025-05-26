@@ -26,6 +26,9 @@ pub struct API {
 
     /// Life time of assigned code
     pub code_life_time: u64,
+
+    /// Length of generated code
+    pub code_length: u8,
 }
 
 #[derive(Deserialize, Debug)]

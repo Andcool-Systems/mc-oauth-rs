@@ -74,6 +74,9 @@ port = 8008
 # Life time of assigned code
 code_life_time = 300
 
+# Length of generated code
+code_length = 6
+
 [server]
 # Minecraft server address
 addr = "0.0.0.0"

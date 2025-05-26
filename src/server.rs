@@ -174,7 +174,7 @@ impl MinecraftServer {
             }
         };
         let map = get_map().await;
-        let code = generate_code(6); // Generate 6-digit code
+        let code = generate_code(self.config.api.code_length); // Generate x-digit code
 
         // Insert client data into hash map
         map.insert(
