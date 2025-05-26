@@ -14,10 +14,7 @@ impl MinecraftServer {
     pub async fn send_status(&mut self) -> Result<()> {
         let config = get_config().await;
         let proto_ver = if config.server.config.protocol == 0 {
-            match self.session.proto_ver {
-                Some(x) => x,
-                None => unreachable!(),
-            }
+            self.session.proto_ver
         } else {
             config.server.config.protocol
         };

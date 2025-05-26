@@ -24,7 +24,7 @@ pub enum NextStateEnum {
 #[derive(Debug)]
 pub struct Session {
     pub server_id: String,
-    pub proto_ver: Option<usize>,
+    pub proto_ver: usize,
     pub next_state: NextStateEnum,
     pub nickname: Option<String>,
     pub uuid: Option<Uuid>,
@@ -40,7 +40,7 @@ impl Session {
 
         Self {
             server_id: config.server.config.server_name.clone(),
-            proto_ver: None,
+            proto_ver: 0,
             next_state: NextStateEnum::Unknown,
             nickname: None,
             uuid: None,
@@ -128,7 +128,7 @@ impl MinecraftServer {
             NextStateEnum::Status => self.send_status().await?, // Send status response
             NextStateEnum::Login => {
                 // Handle login start
-                self.handle_login_start()?;
+                self.handle_login_start().await?;
                 self.send_encryption().await?;
             }
             NextStateEnum::Unknown => self.handle_handshake().await?, // Handle handshake
