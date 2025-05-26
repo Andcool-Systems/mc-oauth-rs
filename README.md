@@ -131,6 +131,9 @@ bad_session = "§cFailed to login: Invalid session (Try restarting your game and
 
 # Message for bad server address (`server_ip` setting)
 using_proxy = "§cYou are using a proxy!"
+
+# Message for internal server error
+internal_error = "§cSorry, internal server error occurred"
 ```
 
 
