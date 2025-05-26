@@ -77,7 +77,12 @@ impl MinecraftServer {
                 "Connection from {:?} closed successfully",
                 self.session.addr
             ),
-            Err(e) => error!("Internal error occurred: {}", e),
+            Err(e) => {
+                let _ = self
+                    .send_disconnect(self.config.messages.internal_error.clone())
+                    .await;
+                error!("Internal error occurred: {}", e)
+            }
         }
     }
 

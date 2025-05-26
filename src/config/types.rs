@@ -94,4 +94,7 @@ pub struct Messages {
 
     /// Using a proxy
     pub using_proxy: String,
+
+    /// Message for internal server error
+    pub internal_error: String,
 }
