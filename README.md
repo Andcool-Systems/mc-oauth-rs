@@ -92,6 +92,10 @@ timeout = 10
 # This is necessary to prevent proxy bypass or spoofing.
 server_ip = "localhost"
 
+# Enable partial support of 1.19-1.19.2 clients
+# https://github.com/Andcool-Systems/mc-oauth-rs/issues/1
+support_1_19 = false
+
 [server.config]
 # Minecraft server name
 server_name = "mc-oauth-rs"

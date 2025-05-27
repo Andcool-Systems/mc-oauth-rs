@@ -89,8 +89,8 @@ pub fn try_get_uuid(buf: &mut BytesMut) -> anyhow::Result<Uuid> {
         return Err(Error::msg("Not enough data"));
     }
 
-    if len > 16 && read_varint(buf)? == 0 {
-        return Err(Error::msg("No UUID in packet"));
+    if len > 16 {
+        buf.advance(len - 16); // Normalize uuid length
     }
 
     let mut bytes = [0u8; 16];

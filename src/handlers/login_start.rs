@@ -10,9 +10,12 @@ impl MinecraftServer {
         self.session.nickname = Some(packet.name);
         self.session.uuid = packet.uuid;
 
-        if self.session.proto_ver >= 759 && self.session.proto_ver <= 762 {
+        if self.session.proto_ver >= 759
+            && self.session.proto_ver <= 760
+            && !self.config.server.support_1_19
+        {
             self.send_disconnect(
-                "Sorry, Minecraft 1.19.* clients not supported yet.\nTry using another version of client."
+                "§cSorry, Minecraft 1.19-1.19.2 clients not supported yet.\nTry using another version of client."
                     .to_string(),
             )
             .await?;

@@ -50,6 +50,9 @@ pub struct Server {
 
     /// Proxy address (optional)
     pub server_ip: Option<String>,
+
+    /// Enable partial support of 1.19 servers
+    pub support_1_19: bool,
 }
 
 #[derive(Deserialize, Debug)]

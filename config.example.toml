@@ -9,6 +9,7 @@ addr = "0.0.0.0"
 port = 25565
 timeout = 20
 server_ip = "localhost" # Change or remove before production use!
+support_1_19 = false # READ: https://github.com/Andcool-Systems/mc-oauth-rs/issues/1
 
 [server.config]
 server_name = "mc-oauth-rs"
