@@ -97,14 +97,14 @@ server_ip = "localhost"
 support_1_19 = false
 
 [server.config]
-# Minecraft server name
+# Minecraft server name (used for internal auth; can be empty)
 server_name = "mc-oauth-rs"
 
 # Protocol version (`0` for auto)
-# Used only during the server ping and is ignored when trying to connect. If set to 0, the protocol version that the client uses will be applied.
+# If set to 0, the protocol version that the client uses will be applied.
 protocol = 0
 
-# Minecraft version string
+# Minecraft version string (In fact, it's just a stub)
 version = "1.21"
 
 # Session Auth URL  
@@ -141,6 +141,9 @@ using_proxy = "§cYou are using a proxy!"
 
 # Message for internal server error
 internal_error = "§cSorry, internal server error occurred"
+
+# Message for unsupported client version
+unsupported_client_version = "§cYou are using unsupported version of client!"
 ```
 
 

@@ -103,4 +103,7 @@ pub struct Messages {
 
     /// Message for internal server error
     pub internal_error: String,
+
+    /// Message for unsupported client version
+    pub unsupported_client_version: String,
 }

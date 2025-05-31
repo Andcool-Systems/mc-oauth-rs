@@ -30,6 +30,19 @@ impl MinecraftServer {
             }
         }
 
+        // Check client's protocol version
+        let server_proto_ver = self.config.server.config.protocol;
+        if let NextStateEnum::Login = self.session.next_state {
+            if server_proto_ver.ne(&0) && self.session.proto_ver.ne(&server_proto_ver) {
+                self.send_disconnect(self.config.messages.unsupported_client_version.clone())
+                    .await?;
+                return Err(Error::msg(format!(
+                    "Unsupported client version! Server: {}, client: {}",
+                    server_proto_ver, self.session.proto_ver
+                )));
+            }
+        }
+
         Ok(())
     }
 }
