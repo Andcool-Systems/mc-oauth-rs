@@ -14,12 +14,9 @@ impl MinecraftServer {
             && self.session.proto_ver <= 760
             && !self.config.server.support_1_19
         {
-            self.send_disconnect(
-                "§cSorry, Minecraft 1.19-1.19.2 clients not supported yet.\nTry using another version of client."
-                    .to_string(),
-            )
-            .await?;
-            return Err(Error::msg("Client using unsupported version!"));
+            self.send_disconnect(self.config.messages.unsupported_client_version.clone())
+                .await?;
+            return Err(Error::msg("Client using unsupported version (1.19)!"));
         }
         Ok(())
     }
