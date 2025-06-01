@@ -1,3 +1,9 @@
+/*
+MIT License
+
+Developed and implemented by AndcoolSystems, 2025
+*/
+
 mod api;
 mod byte_buf_utils;
 mod config;
@@ -96,10 +102,11 @@ async fn main() -> anyhow::Result<()> {
                         let mut client = MinecraftServer::new(stream, keys.clone()).await?;
                         info!("New connection from: {}", addr);
 
+                        let timeout_duration = Duration::from_secs(config.server.timeout);
                         tokio::spawn(async move {
                             // Setting client timeout
                             timeout(
-                                Duration::from_secs(config.server.timeout),
+                                timeout_duration,
                                 client.run()
                             ).await.unwrap_or_else(|_| {error!("Connection from {} has been timed out", addr);})
                         });
