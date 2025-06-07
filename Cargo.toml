@@ -1,6 +1,6 @@
 [package]
 name = "mc-oauth"
-version = "0.1.9"
+version = "0.1.10"
 edition = "2021"
 authors = ["AndcoolSystems"]
 license = "MIT"
