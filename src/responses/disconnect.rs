@@ -1,9 +1,9 @@
-use crate::{packets::disconnect::DisconnectPacket, server::MinecraftServer};
+use crate::{packets::disconnect::DisconnectPacket, session::Session};
 use anyhow::Result;
 use tokio::io::AsyncWriteExt;
 use tracing::debug;
 
-impl MinecraftServer {
+impl Session {
     /**
     Send disconnect packet with provided reason
     */

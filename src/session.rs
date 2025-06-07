@@ -23,6 +23,11 @@ pub enum NextStateEnum {
 
 #[derive(Debug)]
 pub struct Session {
+    pub buffer: BytesMut,
+    pub config: &'static config::types::Config,
+    pub stream: TcpStream,
+    pub keys: Arc<rsa::RsaPrivateKey>,
+
     pub server_id: String,
     pub proto_ver: usize,
     pub next_state: NextStateEnum,
@@ -34,39 +39,23 @@ pub struct Session {
 }
 
 impl Session {
-    pub async fn new() -> Self {
+    pub async fn new(stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Self {
         let config = get_config().await;
 
         Self {
             server_id: config.server.config.server_name.clone(),
+            verify_token: generate_verify_token(),
+            buffer: BytesMut::new(),
+            config: get_config().await,
+            stream: stream,
+            keys: keys,
             proto_ver: 0,
             next_state: NextStateEnum::Unknown,
             nickname: None,
             uuid: None,
             secret: None,
-            verify_token: generate_verify_token(),
             cipher: None,
         }
-    }
-}
-
-pub struct MinecraftServer {
-    pub session: Session,
-    pub buffer: BytesMut,
-    pub config: &'static config::types::Config,
-    pub stream: TcpStream,
-    pub keys: Arc<rsa::RsaPrivateKey>,
-}
-
-impl MinecraftServer {
-    pub async fn new(stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Result<Self> {
-        Ok(Self {
-            session: Session::new().await,
-            buffer: BytesMut::new(),
-            config: get_config().await,
-            stream,
-            keys,
-        })
     }
 
     pub async fn run(&mut self) -> Result<()> {
@@ -117,7 +106,7 @@ impl MinecraftServer {
     Handle packet with id 0
     */
     async fn handle_packet_0(&mut self) -> Result<()> {
-        match self.session.next_state {
+        match self.next_state {
             NextStateEnum::Status => self.send_status().await?, // Send status response
             NextStateEnum::Login => {
                 // Handle login start
@@ -134,7 +123,7 @@ impl MinecraftServer {
     Handle packet with id 1
     */
     async fn handle_packet_1(&mut self) -> Result<()> {
-        match self.session.next_state {
+        match self.next_state {
             NextStateEnum::Status => {
                 // Handle ping request
                 let payload = self.buffer.get_i64();
@@ -151,7 +140,7 @@ impl MinecraftServer {
     }
 
     async fn auth_client(&mut self) -> Result<()> {
-        let player_data = mojang::join(&mut self.session, self.keys.clone()).await?;
+        let player_data = mojang::join(self).await?;
 
         let player_data = match player_data {
             Some(x) => x,

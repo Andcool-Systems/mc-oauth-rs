@@ -1,9 +1,9 @@
 use anyhow::Result;
 
-use crate::{packets::pong::PongPacket, server::MinecraftServer};
+use crate::{packets::pong::PongPacket, session::Session};
 use tokio::io::AsyncWriteExt;
 
-impl MinecraftServer {
+impl Session {
     /**
     Send pong response
     */

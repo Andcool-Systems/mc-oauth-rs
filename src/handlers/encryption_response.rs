@@ -1,9 +1,9 @@
-use crate::{packets::encryption_response::EncryptionResponsePacket, server::MinecraftServer};
+use crate::{packets::encryption_response::EncryptionResponsePacket, session::Session};
 use aes::{cipher::KeyIvInit, Aes128};
 use anyhow::{Error, Result};
 use rsa::Pkcs1v15Encrypt;
 
-impl MinecraftServer {
+impl Session {
     /**
     Handle encryption response
 
@@ -23,7 +23,7 @@ impl MinecraftServer {
             // Check tokens equality
             if decrypted_verify
                 .iter()
-                .zip(&self.session.verify_token)
+                .zip(&self.verify_token)
                 .filter(|&(a, b)| a == b)
                 .count()
                 != decrypted_verify.len()
@@ -33,8 +33,8 @@ impl MinecraftServer {
         }
 
         // Set up client cipher
-        self.session.secret = Some(decrypted_secret.clone());
-        self.session.cipher = Some(cfb8::Encryptor::<Aes128>::new_from_slices(
+        self.secret = Some(decrypted_secret.clone());
+        self.cipher = Some(cfb8::Encryptor::<Aes128>::new_from_slices(
             &decrypted_secret.clone(),
             &decrypted_secret.clone(),
         )?);

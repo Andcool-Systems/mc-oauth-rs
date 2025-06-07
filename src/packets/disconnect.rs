@@ -7,22 +7,23 @@ pub struct DisconnectPacket {
     pub reason: String,
 }
 
+impl Default for DisconnectPacket {
+    /**
+    Create empty disconnect packet
+    */
+    fn default() -> Self {
+        Self {
+            reason: String::new(),
+        }
+    }
+}
+
 impl DisconnectPacket {
     /**
     Create disconnect packet with provided reason
     */
     pub fn with_reason(reason: String) -> Self {
         Self { reason }
-    }
-
-    /**
-    Create empty disconnect packet
-    */
-    #[allow(dead_code)]
-    pub fn new() -> Self {
-        Self {
-            reason: String::new(),
-        }
     }
 
     /**

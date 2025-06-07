@@ -1,20 +1,20 @@
 use crate::{
     config::get_config,
     packets::status::{self, StatusData, StatusPacket},
-    server::MinecraftServer,
+    session::Session,
 };
 use anyhow::Result;
 use serde_json::json;
 use tokio::io::AsyncWriteExt;
 
-impl MinecraftServer {
+impl Session {
     /**
     Send status response
     */
     pub async fn send_status(&mut self) -> Result<()> {
         let config = get_config().await;
         let proto_ver = if config.server.config.protocol == 0 {
-            self.session.proto_ver
+            self.proto_ver
         } else {
             config.server.config.protocol
         };

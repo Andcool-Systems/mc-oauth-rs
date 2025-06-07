@@ -15,7 +15,7 @@ mod map;
 mod mojang;
 mod packets;
 mod responses;
-mod server;
+mod session;
 
 use std::{
     net::{Ipv4Addr, SocketAddrV4},
@@ -26,7 +26,7 @@ use std::{
 
 use api::build_http_server;
 use generators::generate_key_pair;
-use server::MinecraftServer;
+use session::Session;
 use tokio::{net::TcpListener, sync::Notify};
 use tokio::{signal, time::timeout};
 use tracing::{debug, error, info, Level};
@@ -95,7 +95,7 @@ async fn main() -> anyhow::Result<()> {
             result = listener.accept() => {
                 match result {
                     Ok((stream, addr)) => {
-                        let mut client = MinecraftServer::new(stream, keys.clone()).await?;
+                        let mut client = Session::new(stream, keys.clone()).await;
                         info!("New connection from: {}", addr);
 
                         let timeout_duration = Duration::from_secs(config.server.timeout);

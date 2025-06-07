@@ -1,4 +1,4 @@
-use crate::{byte_buf_utils::read_varint, server::MinecraftServer};
+use crate::{byte_buf_utils::read_varint, session::Session};
 use anyhow::Result;
 use bytes::BytesMut;
 
@@ -9,13 +9,13 @@ pub struct EncryptionResponsePacket {
 }
 
 impl EncryptionResponsePacket {
-    pub fn parse(server: &mut MinecraftServer) -> Result<Self> {
+    pub fn parse(server: &mut Session) -> Result<Self> {
         let shared_secret_length = read_varint(&mut server.buffer)?;
         let shared_secret = server.buffer.split_to(shared_secret_length);
 
         let mut has_verify = false;
         let mut verify_token = BytesMut::new();
-        if !(server.session.proto_ver >= 759 && server.session.proto_ver <= 760) {
+        if !(server.proto_ver >= 759 && server.proto_ver <= 760) {
             let verify_token_length = read_varint(&mut server.buffer)?;
             verify_token = server.buffer.split_to(verify_token_length);
             has_verify = true;
