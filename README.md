@@ -64,6 +64,11 @@ After the project is fully built, the binary file for your OS will be available 
 For the server to work, create a `config.toml` file in the same directory as the executable with the following contents:
 
 ```toml
+[global]
+# Server logging level. Possible values:
+# debug, info, warn, error, trace
+logging_level = "info"
+
 [api]
 # API address
 addr = "0.0.0.0"

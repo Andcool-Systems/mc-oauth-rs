@@ -9,8 +9,8 @@ use aes::Aes128;
 use anyhow::{anyhow, Result};
 use bytes::{Buf, BufMut, BytesMut};
 use cfb8::Encryptor;
-use std::{net::SocketAddr, sync::Arc, time::Duration};
-use tokio::net::TcpStream;
+use std::{sync::Arc, time::Duration};
+use tokio::{io, net::TcpStream};
 use tracing::{debug, error, info};
 use uuid::Uuid;
 
@@ -31,11 +31,10 @@ pub struct Session {
     pub secret: Option<Vec<u8>>, // Shared secret,
     pub verify_token: [u8; 4],
     pub cipher: Option<Encryptor<Aes128>>,
-    pub addr: SocketAddr,
 }
 
 impl Session {
-    pub async fn new(addr: SocketAddr) -> Self {
+    pub async fn new() -> Self {
         let config = get_config().await;
 
         Self {
@@ -47,7 +46,6 @@ impl Session {
             secret: None,
             verify_token: generate_verify_token(),
             cipher: None,
-            addr,
         }
     }
 }
@@ -63,7 +61,7 @@ pub struct MinecraftServer {
 impl MinecraftServer {
     pub async fn new(stream: TcpStream, keys: Arc<rsa::RsaPrivateKey>) -> Result<Self> {
         Ok(Self {
-            session: Session::new(stream.peer_addr()?).await,
+            session: Session::new().await,
             buffer: BytesMut::new(),
             config: get_config().await,
             stream,
@@ -71,22 +69,7 @@ impl MinecraftServer {
         })
     }
 
-    pub async fn run(&mut self) {
-        match self._run().await {
-            Ok(_) => info!(
-                "Connection from {:?} closed successfully",
-                self.session.addr
-            ),
-            Err(e) => {
-                let _ = self
-                    .send_disconnect(self.config.messages.internal_error.clone())
-                    .await;
-                error!("Internal error occurred: {}", e)
-            }
-        }
-    }
-
-    async fn _run(&mut self) -> Result<()> {
+    pub async fn run(&mut self) -> Result<()> {
         loop {
             self.stream.readable().await?;
             let mut temp_buf = vec![0; 1024];
@@ -100,7 +83,12 @@ impl MinecraftServer {
                     self.buffer.put_slice(&temp_buf[..n]);
                     self.handle_packet().await?;
                 }
-                Err(_) => {}
+                Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
+                    continue;
+                }
+                Err(e) => {
+                    error!("Read error: {}", e)
+                }
             }
             self.buffer.clear();
         }

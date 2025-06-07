@@ -10,6 +10,7 @@ mod config;
 mod encryption;
 mod generators;
 mod handlers;
+mod logging;
 mod map;
 mod mojang;
 mod packets;
@@ -28,29 +29,24 @@ use generators::generate_key_pair;
 use server::MinecraftServer;
 use tokio::{net::TcpListener, sync::Notify};
 use tokio::{signal, time::timeout};
-use tracing::{error, info};
+use tracing::{debug, error, info, Level};
 
-fn init_logger(level: tracing::Level) {
-    use tracing_subscriber::FmtSubscriber;
-
-    tracing::subscriber::set_global_default(
-        FmtSubscriber::builder()
-            .compact()
-            .with_max_level(level)
-            .without_time()
-            .finish(),
-    )
-    .expect("Fail to set global default subscriber");
-}
+use crate::logging::{init_logger, set_log_level, str_to_log_level};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // Set up logger
-    init_logger(tracing::Level::DEBUG);
+    let reload_handle = init_logger(tracing::Level::DEBUG);
 
     // Load config from file
     config::load("config.toml").await?;
     let config = config::get_config().await;
+
+    // Set logging level from config
+    set_log_level(
+        reload_handle,
+        str_to_log_level(&config.global.logging_level).unwrap_or(Level::INFO),
+    );
 
     // Generate key pair
     let keys = Arc::new(generate_key_pair());
@@ -105,10 +101,18 @@ async fn main() -> anyhow::Result<()> {
                         let timeout_duration = Duration::from_secs(config.server.timeout);
                         tokio::spawn(async move {
                             // Setting client timeout
-                            timeout(
-                                timeout_duration,
-                                client.run()
-                            ).await.unwrap_or_else(|_| {error!("Connection from {} has been timed out", addr);})
+                            match timeout(timeout_duration, client.run()).await {
+                                Ok(Ok(_)) => {
+                                    debug!("Connection from {} closed successfully", addr)
+                                }
+                                Ok(Err(e)) => {
+                                    let _ = client
+                                        .send_disconnect(config.messages.internal_error.clone())
+                                        .await;
+                                    error!("Internal error occurred: {}", e)
+                                }
+                                Err(e) => error!("Connection from {} has been timed out ({})", addr, e),
+                            }
                         });
                     },
                     Err(e) => {

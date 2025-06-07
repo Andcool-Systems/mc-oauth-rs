@@ -2,6 +2,9 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
+    /// Global APP config
+    pub global: GlobalConfig,
+
     /// API config
     pub api: API,
 
@@ -14,6 +17,12 @@ pub struct Config {
     #[serde(skip)]
     /// Base 64 encoded server icon
     pub image: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct GlobalConfig {
+    /// Logging level
+    pub logging_level: String,
 }
 
 #[derive(Deserialize, Debug)]

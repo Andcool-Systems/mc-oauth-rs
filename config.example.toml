@@ -1,31 +1,85 @@
+[global]
+# Server logging level. Possible values:
+# debug, info, warn, error, trace
+logging_level = "info"
+
 [api]
+# API address
 addr = "0.0.0.0"
+
+# API port
 port = 8008
+
+# Life time of assigned code
 code_life_time = 300
+
+# Length of generated code
 code_length = 6
 
 [server]
+# Minecraft server address
 addr = "0.0.0.0"
+
+# Minecraft server port
 port = 25565
-timeout = 20
-server_ip = "localhost" # Change or remove before production use!
-support_1_19 = false # READ: https://github.com/Andcool-Systems/mc-oauth-rs/issues/1
+
+# Server connection timeout
+# Sets the maximum time a client can stay connected to the server. Used to prevent idle or junk connections.
+timeout = 10
+
+# [Optional] This parameter defines the server host to which the clients connect.
+# This is necessary to prevent proxy bypass or spoofing.
+server_ip = "localhost"
+
+# Enable partial support of 1.19-1.19.2 clients
+# https://github.com/Andcool-Systems/mc-oauth-rs/issues/1
+support_1_19 = false
 
 [server.config]
+# Minecraft server name (used for internal auth; can be empty)
 server_name = "mc-oauth-rs"
+
+# Protocol version (`0` for auto)
+# If set to 0, the protocol version that the client uses will be applied.
 protocol = 0
+
+# Minecraft version string (In fact, it's just a stub)
 version = "1.21"
+
+# Session Auth URL  
+# `{{NAME}}` in string will be replaced by the client nickname  
+# `{{HASH}}` will be replaced by the generated client hash
 auth_url = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username={{NAME}}&serverId={{HASH}}"
 
 [server.status]
+# Server description (you can use MOTD)
 description = "§6mc-oauth.andcool.ru"
+
+# Max players count, displayed in server list
 players_max = 0
+
+# Online players count, displayed in server list
 players_online = 0
+
+# Path to the server icon (can be empty)
+# Should be in .png format and 64x64 pixels in size
 icon_path = "server_icon.png"
 
 [messages]
+# Message for successful auth  
+# `{{NAME}}` will be replaced by the client nickname  
+# `{{UUID}}` will be replaced by the client UUID  
+# `{{CODE}}` will be replaced by the generated code
 success = "Hello, §6{{NAME}}§r! Your code is: §a{{CODE}}"
+
+# Message for Mojang API error
 bad_session = "§cFailed to login: Invalid session (Try restarting your game and the launcher)"
+
+# Message for bad server address (`server_ip` setting)
 using_proxy = "§cYou are using a proxy!"
+
+# Message for internal server error
 internal_error = "§cSorry, internal server error occurred"
+
+# Message for unsupported client version
 unsupported_client_version = "§cYou are using unsupported version of client!"
