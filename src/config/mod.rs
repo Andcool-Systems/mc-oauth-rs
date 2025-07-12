@@ -36,9 +36,7 @@ pub async fn get_config() -> &'static types::Config {
     CONFIG.get().expect("Config didn't loaded")
 }
 
-/**
-Load server icon from file
-*/
+/// Load server icon from file
 pub async fn load_server_icon(file_path: &str) -> anyhow::Result<String> {
     let file_content = fs::read(file_path).await?;
     Ok(base64_encode_bytes(&file_content))

@@ -84,9 +84,7 @@ impl Session {
         Ok(())
     }
 
-    /**
-    Packet handler
-    */
+    /// Packet handler
     async fn handle_packet(&mut self) -> Result<()> {
         while self.packet_available() {
             let packet_id = read_varint(&mut self.buffer)?;
@@ -102,9 +100,7 @@ impl Session {
         Ok(())
     }
 
-    /**
-    Handle packet with id 0
-    */
+    /// Handle packet with id 0
     async fn handle_packet_0(&mut self) -> Result<()> {
         match self.next_state {
             NextStateEnum::Status => self.send_status().await?, // Send status response
@@ -119,9 +115,7 @@ impl Session {
         Ok(())
     }
 
-    /**
-    Handle packet with id 1
-    */
+    /// Handle packet with id 1
     async fn handle_packet_1(&mut self) -> Result<()> {
         match self.next_state {
             NextStateEnum::Status => {
@@ -139,6 +133,7 @@ impl Session {
         Ok(())
     }
 
+    /// Auth client in Mojang and generate keys
     async fn auth_client(&mut self) -> Result<()> {
         let player_data = mojang::join(self).await?;
 

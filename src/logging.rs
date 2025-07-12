@@ -9,9 +9,7 @@ use tracing_subscriber::{
 
 type ReloadHandle = Handle<LevelFilter, FmtSubscriber<DefaultFields, Format<Compact, ()>>>;
 
-/**
-Init logger with provided level
-*/
+/// Init logger with provided level
 pub fn init_logger(initial_level: Level) -> ReloadHandle {
     let filter = LevelFilter::from_level(initial_level);
     let (filter_layer, reload_handle) = reload::Layer::new(filter);
@@ -28,18 +26,14 @@ pub fn init_logger(initial_level: Level) -> ReloadHandle {
     reload_handle
 }
 
-/**
-Set logging level for existing logger
-*/
+/// Set logging level for existing logger
 pub fn set_log_level(handle: ReloadHandle, level: tracing::Level) {
     handle
         .modify(|filter| *filter = LevelFilter::from_level(level))
         .expect("Failed to change log level");
 }
 
-/**
-Get log level from string
-*/
+/// Get log level from string
 pub fn str_to_log_level(level: &str) -> Option<Level> {
     match level.to_lowercase().as_str() {
         "trace" => Some(Level::TRACE),

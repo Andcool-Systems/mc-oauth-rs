@@ -4,9 +4,7 @@ use rsa::pkcs8::EncodePublicKey;
 use tokio::io::AsyncWriteExt;
 
 impl Session {
-    /**
-    Send encryption response
-    */
+    /// Send encryption response
     pub async fn send_encryption(&mut self) -> Result<()> {
         let public_der = self.keys.to_public_key().to_public_key_der()?.into_vec();
 

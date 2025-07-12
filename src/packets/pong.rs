@@ -7,9 +7,7 @@ pub struct PongPacket {
 }
 
 impl PongPacket {
-    /**
-    Build packet for sending over network
-    */
+    /// Build packet for sending over network
     pub fn build(&self) -> Result<BytesMut> {
         let mut buffer = BytesMut::new();
 

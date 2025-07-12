@@ -8,9 +8,7 @@ pub struct DisconnectPacket {
 }
 
 impl Default for DisconnectPacket {
-    /**
-    Create empty disconnect packet
-    */
+    /// Create empty disconnect packet
     fn default() -> Self {
         Self {
             reason: String::new(),
@@ -19,16 +17,12 @@ impl Default for DisconnectPacket {
 }
 
 impl DisconnectPacket {
-    /**
-    Create disconnect packet with provided reason
-    */
+    /// Create disconnect packet with provided reason
     pub fn with_reason(reason: String) -> Self {
         Self { reason }
     }
 
-    /**
-    Build packet for sending over network
-    */
+    /// Build packet for sending over network
     pub fn build(&self) -> Result<BytesMut> {
         let mut buffer = BytesMut::new();
 

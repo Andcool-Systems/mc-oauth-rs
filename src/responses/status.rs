@@ -8,9 +8,7 @@ use serde_json::json;
 use tokio::io::AsyncWriteExt;
 
 impl Session {
-    /**
-    Send status response
-    */
+    /// Send status response
     pub async fn send_status(&mut self) -> Result<()> {
         let config = get_config().await;
         let proto_ver = if config.server.config.protocol == 0 {

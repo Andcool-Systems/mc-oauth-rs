@@ -4,9 +4,7 @@ use tokio::io::AsyncWriteExt;
 use tracing::debug;
 
 impl Session {
-    /**
-    Send disconnect packet with provided reason
-    */
+    /// Send disconnect packet with provided reason
     pub async fn send_disconnect(&mut self, reason: String) -> Result<()> {
         let mut disconnect_packet = DisconnectPacket::with_reason(reason.clone()).build()?;
 
