@@ -10,7 +10,7 @@ addr = "0.0.0.0"
 # API port
 port = 8008
 
-# Life time of assigned code
+# Life time of assigned code in seconds
 code_life_time = 300
 
 # Length of generated code
@@ -23,7 +23,7 @@ addr = "0.0.0.0"
 # Minecraft server port
 port = 25565
 
-# Server connection timeout
+# Server connection timeout in seconds
 # Sets the maximum time a client can stay connected to the server. Used to prevent idle or junk connections.
 timeout = 10
 
