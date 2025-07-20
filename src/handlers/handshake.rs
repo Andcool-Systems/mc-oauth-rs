@@ -22,11 +22,16 @@ impl Session {
         };
 
         // Check client's connecting hostname
-        if let Some(server_ip) = &self.config.server.server_ip {
-            if server_ip.ne(&handshake.server_addr) {
+        if !self.config.server.server_ips.is_empty() {
+            if !self
+                .config
+                .server
+                .server_ips
+                .contains(&handshake.server_addr)
+            {
                 self.send_disconnect(self.config.messages.using_proxy.clone())
                     .await?;
-                return Err(Error::msg("Client using a proxy!"));
+                return Err(Error::msg("Client using a proxy"));
             }
         }
 

@@ -57,8 +57,8 @@ pub struct Server {
     /// Server list ping config
     pub status: ServerStatus,
 
-    /// Proxy address (optional)
-    pub server_ip: Option<String>,
+    /// Proxy addresses
+    pub server_ips: Vec<String>,
 
     /// Enable partial support of 1.19 servers
     pub support_1_19: bool,

@@ -27,9 +27,10 @@ port = 25565
 # Sets the maximum time a client can stay connected to the server. Used to prevent idle or junk connections.
 timeout = 10
 
-# [Optional] This parameter defines the server host to which the clients connect.
+# This parameter defines the list of server IP addresses that clients connect to.
 # This is necessary to prevent proxy bypass or spoofing.
-server_ip = "localhost"
+# Leave empty for accept all ips
+server_ips = []
 
 # Enable partial support of 1.19-1.19.2 clients
 # https://github.com/Andcool-Systems/mc-oauth-rs/issues/1
