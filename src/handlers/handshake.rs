@@ -6,11 +6,9 @@ use crate::{
 };
 
 impl Session {
-    /**
-    Handle handshake packet
-
-    Also check client's connection host
-    */
+    /// Handle handshake packet
+    ///
+    /// Also check client's connection host
     pub async fn handle_handshake(&mut self) -> Result<()> {
         let handshake = HandshakePacket::parse(&mut self.buffer)?;
 
@@ -22,17 +20,16 @@ impl Session {
         };
 
         // Check client's connecting hostname
-        if !self.config.server.server_ips.is_empty() {
-            if !self
+        if !self.config.server.server_ips.is_empty()
+            && !self
                 .config
                 .server
                 .server_ips
                 .contains(&handshake.server_addr)
-            {
-                self.send_disconnect(self.config.messages.using_proxy.clone())
-                    .await?;
-                return Err(Error::msg("Client using a proxy"));
-            }
+        {
+            self.send_disconnect(self.config.messages.using_proxy.clone())
+                .await?;
+            return Err(Error::msg("Client using a proxy"));
         }
 
         // Check client's protocol version

@@ -65,7 +65,7 @@ pub fn write_varint(buf: &mut BytesMut, value: i32) {
 pub fn add_size(data: &BytesMut) -> BytesMut {
     let mut packet = BytesMut::new();
     write_varint(&mut packet, data.len() as i32);
-    packet.extend_from_slice(&data);
+    packet.extend_from_slice(data);
     packet
 }
 
@@ -79,10 +79,8 @@ pub fn read_unsigned_short(buf: &mut BytesMut) -> io::Result<u16> {
     Ok(buf.get_u16())
 }
 
-/*
-For some reason, not all Minecraft clients send their UUID correctly,
-so you have to return Result, since parsing is not always possible.
-*/
+// For some reason, not all Minecraft clients send their UUID correctly,
+// so you have to return Result, since parsing is not always possible.
 pub fn try_get_uuid(buf: &mut BytesMut) -> anyhow::Result<Uuid> {
     let len = buf.len();
     if len < 16 {

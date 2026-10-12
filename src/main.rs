@@ -1,9 +1,6 @@
-/*
-MIT License
-
-Developed and implemented by AndcoolSystems, 2025
-*/
-
+/// MIT License
+///
+/// Developed and implemented by AndcoolSystems, 2025
 mod api;
 mod byte_buf_utils;
 mod config;
@@ -50,7 +47,6 @@ async fn main() -> anyhow::Result<()> {
 
     // Generate key pair
     let keys = Arc::new(generate_key_pair());
-    map::init_map();
 
     // Start HTTP API
     let http = build_http_server(SocketAddrV4::new(
@@ -58,7 +54,7 @@ async fn main() -> anyhow::Result<()> {
         config.api.port,
     ))?;
 
-    tokio::spawn(async move { http.await });
+    tokio::spawn(http);
     info!("API started on port {}", config.api.port);
 
     // Bind TCP server

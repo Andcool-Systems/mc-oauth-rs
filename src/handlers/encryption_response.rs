@@ -4,11 +4,9 @@ use anyhow::{Error, Result};
 use rsa::Pkcs1v15Encrypt;
 
 impl Session {
-    /**
-    Handle encryption response
-
-    Check verify tokens and set up the cipher
-    */
+    /// Handle encryption response
+    ///
+    /// Check verify tokens and set up the cipher
     pub fn handle_encryption(&mut self) -> Result<()> {
         let response = EncryptionResponsePacket::parse(self)?;
 
@@ -35,8 +33,8 @@ impl Session {
         // Set up client cipher
         self.secret = Some(decrypted_secret.clone());
         self.cipher = Some(cfb8::Encryptor::<Aes128>::new_from_slices(
-            &decrypted_secret.clone(),
-            &decrypted_secret.clone(),
+            &decrypted_secret,
+            &decrypted_secret,
         )?);
         Ok(())
     }

@@ -6,7 +6,7 @@ pub struct Config {
     pub global: GlobalConfig,
 
     /// API config
-    pub api: API,
+    pub api: Api,
 
     /// Minecraft server config
     pub server: Server,
@@ -26,7 +26,7 @@ pub struct GlobalConfig {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct API {
+pub struct Api {
     /// API address
     pub addr: String,
 
